@@ -97,6 +97,9 @@ namespace YouTubeMusicAPI
                 string tempFilePath = Path.Combine(@"Z:\MP3", $"{video.Author} - {video.Title}.webm"); // Tymczasowy plik audio
                 string mp3FilePath = Path.Combine(@"Z:\MP3", $"{video.Author} - {video.Title}.mp3"); // Docelowy plik MP3
 
+                tempFilePath = RemoveInvalidPathChars(tempFilePath);
+                mp3FilePath = RemoveInvalidPathChars(mp3FilePath);
+
                 if (!File.Exists(mp3FilePath))
                 {
                     // Pobieranie strumienia audio
@@ -135,6 +138,12 @@ namespace YouTubeMusicAPI
             {
                 process.WaitForExit();
             }
+        }
+
+        static string RemoveInvalidPathChars(string path)
+        {
+            char[] invalidChars = Path.GetInvalidPathChars();
+            return string.Concat(path.Where(c => !invalidChars.Contains(c)));
         }
     }
 }
