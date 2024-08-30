@@ -2,8 +2,6 @@
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using Google.Apis.YouTube.v3;
-using NAudio.Lame;
-using NAudio.Wave;
 using System.Diagnostics;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
@@ -12,8 +10,14 @@ namespace YouTubeMusicAPI
 {
     internal class Program
     {
+        static YouTubeService youtubeService;
+
         static async Task Main(string[] args)
         {
+            //////////////////////////////////////////////////////////////////////////////////////
+            //DownloadAudioAsMp3(@"https://www.youtube.com/watch?v=zpW8j9CSU24");
+
+            //////////////////////////////////////////////////////////////////////////////////////
             UserCredential credential;
             using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
             {
@@ -26,34 +30,39 @@ namespace YouTubeMusicAPI
                 ).Result;
             }
 
-            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = credential,
                 ApplicationName = "YouTubeAPI"
             });
 
-            var request = youtubeService.Playlists.List("snippet,contentDetails");
-            request.Mine = true;
-            var response = request.Execute();
+            //var request = youtubeService.Playlists.List("snippet,contentDetails");
+            //request.Mine = true;
+            //var response = request.Execute();
 
-            var playlistId = response.Items.Where(p => p.Snippet.Title == "Disco").First().Id;
-
+            //var playlistId = response.Items.Where(p => p.Snippet.Title == "Disco").First().Id;
             //var videoUrls = await GetVideoUrlsFromPlaylist(youtubeService, playlistId);
-            var videoUrls = await GetVideoUrlsFromPlaylist(youtubeService, "LL"); //ulubione utwory
+            //var videoUrls = await GetVideoUrlsFromPlaylist(youtubeService, "LL"); //ulubione utwory
+            //Console.WriteLine("Songs URL downloaded from playlist");
+            //await File.WriteAllLinesAsync(@"Z:\MP3\allSongs.txt", videoUrls);
+
+            var videoUrls = await File.ReadAllLinesAsync(@"Z:\MP3\allSongs.txt");
 
             int counter = 1;
-
             foreach (var url in videoUrls)
             {
                 string mp3Path = "";
-
+                bool isException = false;
                 do
                 {
                     mp3Path = await DownloadAudioAsMp3(url);
-                    Console.WriteLine($"{counter} MP3 file saved to {mp3Path}");
-                } while (mp3Path.StartsWith("Exception"));
+                    isException = mp3Path.StartsWith("Exception");
 
-                counter++;
+                    if (isException)
+                        Console.WriteLine($"{counter} {mp3Path}");
+                    else
+                        Console.WriteLine($"{counter++} MP3 file saved to {mp3Path}");
+                } while (isException);
             }
         }
 
@@ -61,7 +70,7 @@ namespace YouTubeMusicAPI
         {
             var videoUrls = new List<string>();
             string nextPageToken = null;
-
+            var counter = 1;
             do
             {
                 var playlistItemsRequest = youtubeService.PlaylistItems.List("snippet");
@@ -70,12 +79,19 @@ namespace YouTubeMusicAPI
                 playlistItemsRequest.PageToken = nextPageToken;
 
                 var playlistItemsResponse = await playlistItemsRequest.ExecuteAsync();
-
+               
                 foreach (var playlistItem in playlistItemsResponse.Items)
                 {
                     string videoId = playlistItem.Snippet.ResourceId.VideoId;
-                    string videoUrl = $"https://www.youtube.com/watch?v={videoId}";
-                    videoUrls.Add(videoUrl);
+
+
+                    if(await CheckIfVideoExists(videoId))
+                    {
+                        string videoUrl = $"https://www.youtube.com/watch?v={videoId}";
+                        videoUrls.Add(videoUrl);
+
+                        Console.WriteLine($"{counter++} Url checked");
+                    }
                 }
 
                 nextPageToken = playlistItemsResponse.NextPageToken;
@@ -85,23 +101,44 @@ namespace YouTubeMusicAPI
             return videoUrls;
         }
 
+        private static async Task<bool> CheckIfVideoExists(string videoId)
+        {
+            try
+            {
+                var videoRequest = youtubeService.Videos.List("snippet");
+                videoRequest.Id = videoId;
+                var response = await videoRequest.ExecuteAsync();
+
+                return response.Items.Count > 0;
+                
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
         static async Task<string> DownloadAudioAsMp3(string videoUrl)
         {
             try
             {
                 var youtube = new YoutubeClient();
                 var video = await youtube.Videos.GetAsync(videoUrl);
-                var streamManifest = await youtube.Videos.Streams.GetManifestAsync(video.Id);
-                var audioStreamInfo = streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
 
-                string tempFilePath = Path.Combine(@"Z:\MP3", $"{video.Author} - {video.Title}.webm"); // Tymczasowy plik audio
-                string mp3FilePath = Path.Combine(@"Z:\MP3", $"{video.Author} - {video.Title}.mp3"); // Docelowy plik MP3
+                if (video.Duration.Value.TotalSeconds > 600)
+                    return $"{video.Author} - {video.Title} haven't been downloaded with duration {video.Duration.Value.TotalMinutes} minutes";
 
-                tempFilePath = RemoveInvalidPathChars(tempFilePath);
-                mp3FilePath = RemoveInvalidPathChars(mp3FilePath);
+                string author = RemoveTopicAndPrecedingChars(video.Author.ToString());
+                string filename = RemoveInvalidPathChars($"{author} - {video.Title}");
+
+                string tempFilePath = Path.Combine(@"Z:\MP3", $"{filename}.webm"); // Tymczasowy plik audio
+                string mp3FilePath = Path.Combine(@"Z:\MP3", $"{filename}.mp3"); // Docelowy plik MP3
 
                 if (!File.Exists(mp3FilePath))
                 {
+                    var streamManifest = await youtube.Videos.Streams.GetManifestAsync(video.Id);
+                    var audioStreamInfo = streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
+
                     // Pobieranie strumienia audio
                     using (var inputStream = await youtube.Videos.Streams.GetAsync(audioStreamInfo))
                     using (var outputStream = File.Create(tempFilePath))
@@ -115,11 +152,17 @@ namespace YouTubeMusicAPI
                     // Usunięcie tymczasowego pliku
                     File.Delete(tempFilePath);
                 }
+
+                var tagFile = TagLib.File.Create(mp3FilePath);
+                tagFile.Tag.Performers = new[] { author };
+                tagFile.Tag.Title = video.Title;
+                tagFile.Save();
+
                 return mp3FilePath;
             }
             catch (Exception e)
             {
-                return $"Exception - {e.Message}";
+                return $"Exception -> {e.Message} {videoUrl}";
             }
         }
 
@@ -142,8 +185,21 @@ namespace YouTubeMusicAPI
 
         static string RemoveInvalidPathChars(string path)
         {
-            char[] invalidChars = Path.GetInvalidPathChars();
+            char[] invalidChars = "<>:\"/\\|?*".ToCharArray();
             return string.Concat(path.Where(c => !invalidChars.Contains(c)));
+        }
+
+        static string RemoveTopicAndPrecedingChars(string input)
+        {
+            string toRemove = "Topic";
+            int index = input.IndexOf(toRemove);
+
+            if (index >= 3) // Sprawdź, czy istnieje wystarczająco dużo znaków do usunięcia
+            {
+                return input.Remove(index - 3, toRemove.Length + 3);
+            }
+
+            return input; // Jeśli "Topic" nie istnieje lub nie ma wystarczająco dużo znaków, zwróć oryginalny string
         }
     }
 }
