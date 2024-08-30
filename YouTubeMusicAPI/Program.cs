@@ -3,6 +3,7 @@ using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using Google.Apis.YouTube.v3;
 using System.Diagnostics;
+using TagLib.Id3v2;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
 
@@ -36,17 +37,17 @@ namespace YouTubeMusicAPI
                 ApplicationName = "YouTubeAPI"
             });
 
-            //var request = youtubeService.Playlists.List("snippet,contentDetails");
-            //request.Mine = true;
-            //var response = request.Execute();
+            var request = youtubeService.Playlists.List("snippet,contentDetails");
+            request.Mine = true;
+            var response = request.Execute();
 
             //var playlistId = response.Items.Where(p => p.Snippet.Title == "Disco").First().Id;
-            //var videoUrls = await GetVideoUrlsFromPlaylist(youtubeService, playlistId);
-            //var videoUrls = await GetVideoUrlsFromPlaylist(youtubeService, "LL"); //ulubione utwory
-            //Console.WriteLine("Songs URL downloaded from playlist");
-            //await File.WriteAllLinesAsync(@"Z:\MP3\allSongs.txt", videoUrls);
+            ////var videoUrls = await GetVideoUrlsFromPlaylist(youtubeService, playlistId);
+            var videoUrls = await GetVideoUrlsFromPlaylist(youtubeService, "LL"); //ulubione utwory
+            Console.WriteLine("Songs URL downloaded from playlist");
+            await File.WriteAllLinesAsync(@"Z:\MP3\allSongs.txt", videoUrls);
 
-            var videoUrls = await File.ReadAllLinesAsync(@"Z:\MP3\allSongs.txt");
+            //var videoUrls = await File.ReadAllLinesAsync(@"Z:\MP3\allSongs.txt");
 
             int counter = 1;
             foreach (var url in videoUrls)
@@ -84,8 +85,7 @@ namespace YouTubeMusicAPI
                 {
                     string videoId = playlistItem.Snippet.ResourceId.VideoId;
 
-
-                    if(await CheckIfVideoExists(videoId))
+                    if(await CheckIfVideoIsValid(videoId))
                     {
                         string videoUrl = $"https://www.youtube.com/watch?v={videoId}";
                         videoUrls.Add(videoUrl);
@@ -101,15 +101,15 @@ namespace YouTubeMusicAPI
             return videoUrls;
         }
 
-        private static async Task<bool> CheckIfVideoExists(string videoId)
+        private static async Task<bool> CheckIfVideoIsValid(string videoId)
         {
             try
             {
-                var videoRequest = youtubeService.Videos.List("snippet");
+                var videoRequest = youtubeService.Videos.List("snippet,status");
                 videoRequest.Id = videoId;
                 var response = await videoRequest.ExecuteAsync();
 
-                return response.Items.Count > 0;
+                return response.Items.Count > 0 && response.Items[0].Status.PrivacyStatus != "private";
                 
             }
             catch (Exception ex)
