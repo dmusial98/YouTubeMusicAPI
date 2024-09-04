@@ -43,11 +43,11 @@ namespace YouTubeMusicAPI
 
             //var playlistId = response.Items.Where(p => p.Snippet.Title == "Disco").First().Id;
             ////var videoUrls = await GetVideoUrlsFromPlaylist(youtubeService, playlistId);
-            var videoUrls = await GetVideoUrlsFromPlaylist(youtubeService, "LL"); //ulubione utwory
-            Console.WriteLine("Songs URL downloaded from playlist");
-            await File.WriteAllLinesAsync(@"Z:\MP3\allSongs.txt", videoUrls);
+            //var videoUrls = await GetVideoUrlsFromPlaylist(youtubeService, "LL"); //ulubione utwory
+            //Console.WriteLine("Songs URL downloaded from playlist");
+            //await File.WriteAllLinesAsync(@"Z:\MP3\allSongs.txt", videoUrls);
 
-            //var videoUrls = await File.ReadAllLinesAsync(@"Z:\MP3\allSongs.txt");
+            var videoUrls = await File.ReadAllLinesAsync(@"Z:\MP3\allSongs.txt");
 
             int counter = 1;
             foreach (var url in videoUrls)
