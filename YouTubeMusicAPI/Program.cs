@@ -12,6 +12,9 @@ namespace YouTubeMusicAPI
     internal class Program
     {
         static YouTubeService youtubeService;
+        static Dictionary<string, int> errorsNumbersDictionary = new();
+        
+        const int ErrorsNumberConst = 15;
 
         static async Task Main(string[] args)
         {
@@ -19,6 +22,7 @@ namespace YouTubeMusicAPI
             //DownloadAudioAsMp3(@"https://www.youtube.com/watch?v=zpW8j9CSU24");
 
             //////////////////////////////////////////////////////////////////////////////////////
+            
             UserCredential credential;
             using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
             {
@@ -49,6 +53,7 @@ namespace YouTubeMusicAPI
 
             var videoUrls = await File.ReadAllLinesAsync(@"Z:\MP3\allSongs.txt");
 
+            List<string> invalidVideosUrls = new();
             int counter = 1;
             foreach (var url in videoUrls)
             {
@@ -63,8 +68,14 @@ namespace YouTubeMusicAPI
                         Console.WriteLine($"{counter} {mp3Path}");
                     else
                         Console.WriteLine($"{counter++} MP3 file saved to {mp3Path}");
-                } while (isException);
+                } while (isException && errorsNumbersDictionary[url] < ErrorsNumberConst);
             }
+
+            foreach(var url in errorsNumbersDictionary)
+                invalidVideosUrls.Add(url.Key);
+
+            await File.WriteAllLinesAsync(@"Z:\MP3\badUrls.txt", invalidVideosUrls);
+
         }
 
         static async Task<List<string>> GetVideoUrlsFromPlaylist(YouTubeService youtubeService, string playlistId)
@@ -162,6 +173,12 @@ namespace YouTubeMusicAPI
             }
             catch (Exception e)
             {
+                if(errorsNumbersDictionary.TryGetValue(videoUrl, out int errorsNumberInt)) 
+                    errorsNumbersDictionary[videoUrl] = ++errorsNumberInt;
+                else
+                {
+                    errorsNumbersDictionary.Add(videoUrl, 1);
+                }
                 return $"Exception -> {e.Message} {videoUrl}";
             }
         }
