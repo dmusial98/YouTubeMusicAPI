@@ -6,6 +6,7 @@ using System.Diagnostics;
 using TagLib.Id3v2;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
+using YouTubeMusicAPI.Services;
 
 namespace YouTubeMusicAPI
 {
@@ -13,7 +14,7 @@ namespace YouTubeMusicAPI
     {
         static YouTubeService youtubeService;
         static Dictionary<string, int> errorsNumbersDictionary = new();
-        
+
         const int ErrorsNumberConst = 15;
 
         //static async Task Main(string[] args)
@@ -74,10 +75,8 @@ namespace YouTubeMusicAPI
 
         static async Task Main(string[] args)
         {
-            //////////////////////////////////////////////////////////////////////////////////////
-            //DownloadAudioAsMp3(@"https://www.youtube.com/watch?v=zpW8j9CSU24");
+            YTApiCommunication ytApiCommunication = new YTApiCommunication();
 
-            //////////////////////////////////////////////////////////////////////////////////////
 
             UserCredential credential;
             using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
@@ -151,13 +150,8 @@ namespace YouTubeMusicAPI
                 {
                     string videoId = playlistItem.Snippet.ResourceId.VideoId;
 
-                    //if (await CheckIfVideoIsValid(videoId))
-                    //{
-                        string videoUrl = $"https://www.youtube.com/watch?v={videoId}";
-                        videoUrls.Add(videoUrl);
-
-                    //    Console.WriteLine($"{counter++} Url checked");
-                    //}
+                    string videoUrl = $"https://www.youtube.com/watch?v={videoId}";
+                    videoUrls.Add(videoUrl);
                 }
 
                 nextPageToken = playlistItemsResponse.NextPageToken;
