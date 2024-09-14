@@ -1,0 +1,16 @@
+{
+    "playlists": [
+        {
+            "Name": "nazwa_playlisty_1",
+            "Path": "path_to_directory",
+            "UrlsFileName": "filename_with_urls",
+            "BadUrlsFileName": "filename_bad_urls",
+            "GetUrls": true,
+            "DownloadMusic": true,
+            "SaveUrls": true,
+            "SaveBadUrls": true,
+            "DislikeForBadUrls": true,
+            "ErrorNumbersForUrl": 15
+        },
+    ]
+}

@@ -16,22 +16,79 @@ namespace YouTubeMusicAPI
         
         const int ErrorsNumberConst = 15;
 
+        //static async Task Main(string[] args)
+        //{
+        //    var videoUrls = await File.ReadAllLinesAsync(@"Z:\MP3\badUrls.txt");
+
+        //    try
+        //    {
+        //        UserCredential credential;
+        //        using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
+        //        {
+        //            credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+        //                GoogleClientSecrets.Load(stream).Secrets,
+        //                new[] { YouTubeService.Scope.YoutubeForceSsl },
+        //                "user",
+        //                CancellationToken.None,
+        //                new Google.Apis.Util.Store.FileDataStore("YouTubeAPI")
+        //            );
+        //        }
+
+        //        var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+        //        {
+        //            HttpClientInitializer = credential,
+        //            ApplicationName = "YouTubeAPI"
+        //        });
+
+        //        int counter = 1;
+        //        foreach(var video in videoUrls )
+        //        {
+        //            var videoId = video.Remove(0, 32);
+
+        //            try
+        //            {
+        //                var request = youtubeService.Videos.Rate(videoId, VideosResource.RateRequest.RatingEnum.None);
+        //                await request.ExecuteAsync();
+        //                Console.WriteLine($"{counter++} Polubienie zostało usunięte.");
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                Console.WriteLine("Wystąpił błąd podczas usuwania polubienia: " + ex.Message);
+        //            }
+        //        }
+
+        //    }
+        //    catch (AggregateException ex)
+        //    {
+        //        foreach (var e in ex.InnerExceptions)
+        //        {
+        //            Console.WriteLine("Błąd podczas autoryzacji: " + e.Message);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("Nieoczekiwany błąd: " + ex.Message);
+        //    }
+        //}
+
+
         static async Task Main(string[] args)
         {
             //////////////////////////////////////////////////////////////////////////////////////
             //DownloadAudioAsMp3(@"https://www.youtube.com/watch?v=zpW8j9CSU24");
 
             //////////////////////////////////////////////////////////////////////////////////////
-            
+
             UserCredential credential;
             using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
             {
                 credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.Load(stream).Secrets,
-                    new[] { YouTubeService.Scope.YoutubeReadonly },
+                    //new[] { YouTubeService.Scope.YoutubeReadonly },
+                    new[] { YouTubeService.Scope.YoutubeForceSsl },
                     "dmusial98@gmail.com",
                     CancellationToken.None,
-                    new FileDataStore("YouTubeAPI")
+                    new Google.Apis.Util.Store.FileDataStore("YouTubeAPI")
                 ).Result;
             }
 
@@ -41,17 +98,15 @@ namespace YouTubeMusicAPI
                 ApplicationName = "YouTubeAPI"
             });
 
-            var request = youtubeService.Playlists.List("snippet,contentDetails");
-            request.Mine = true;
-            var response = request.Execute();
+            //var request = youtubeService.Playlists.List("snippet,contentDetails");
+            //request.Mine = true;
+            //var response = request.Execute();
 
             //var playlistId = response.Items.Where(p => p.Snippet.Title == "Disco").First().Id;
             ////var videoUrls = await GetVideoUrlsFromPlaylist(youtubeService, playlistId);
-            //var videoUrls = await GetVideoUrlsFromPlaylist(youtubeService, "LL"); //ulubione utwory
-            //Console.WriteLine("Songs URL downloaded from playlist");
-            //await File.WriteAllLinesAsync(@"Z:\MP3\allSongs.txt", videoUrls);
-
-            var videoUrls = await File.ReadAllLinesAsync(@"Z:\MP3\allSongs.txt");
+            var videoUrls = await GetVideoUrlsFromPlaylist(youtubeService, "LL"); //ulubione utwory
+            Console.WriteLine("Songs URL downloaded from playlist");
+            await File.WriteAllLinesAsync(@"Z:\MP3\allSongs.txt", videoUrls);
 
             List<string> invalidVideosUrls = new();
             int counter = 1;
@@ -71,7 +126,7 @@ namespace YouTubeMusicAPI
                 } while (isException && errorsNumbersDictionary[url] < ErrorsNumberConst);
             }
 
-            foreach(var url in errorsNumbersDictionary)
+            foreach (var url in errorsNumbersDictionary)
                 invalidVideosUrls.Add(url.Key);
 
             await File.WriteAllLinesAsync(@"Z:\MP3\badUrls.txt", invalidVideosUrls);
@@ -91,18 +146,18 @@ namespace YouTubeMusicAPI
                 playlistItemsRequest.PageToken = nextPageToken;
 
                 var playlistItemsResponse = await playlistItemsRequest.ExecuteAsync();
-               
+
                 foreach (var playlistItem in playlistItemsResponse.Items)
                 {
                     string videoId = playlistItem.Snippet.ResourceId.VideoId;
 
-                    if(await CheckIfVideoIsValid(videoId))
-                    {
+                    //if (await CheckIfVideoIsValid(videoId))
+                    //{
                         string videoUrl = $"https://www.youtube.com/watch?v={videoId}";
                         videoUrls.Add(videoUrl);
 
-                        Console.WriteLine($"{counter++} Url checked");
-                    }
+                    //    Console.WriteLine($"{counter++} Url checked");
+                    //}
                 }
 
                 nextPageToken = playlistItemsResponse.NextPageToken;
@@ -121,7 +176,7 @@ namespace YouTubeMusicAPI
                 var response = await videoRequest.ExecuteAsync();
 
                 return response.Items.Count > 0 && response.Items[0].Status.PrivacyStatus != "private";
-                
+
             }
             catch (Exception ex)
             {
@@ -173,7 +228,7 @@ namespace YouTubeMusicAPI
             }
             catch (Exception e)
             {
-                if(errorsNumbersDictionary.TryGetValue(videoUrl, out int errorsNumberInt)) 
+                if (errorsNumbersDictionary.TryGetValue(videoUrl, out int errorsNumberInt))
                     errorsNumbersDictionary[videoUrl] = ++errorsNumberInt;
                 else
                 {
