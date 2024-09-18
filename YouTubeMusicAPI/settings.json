@@ -1,20 +1,27 @@
 {
-    "playlists": [
-      {
-        "Name": "DiscoPolo_download",
-        "Path": "Z:\\MP3",
-        "UrlsFileName": "playlist_urls_discopolo",
-        "BadUrlsFileName": "playlist_bad_urls_discopolo",
-        "FFmpegPath": "C:\\Users\\Dawid\\Desktop\\ffmpeg-7.0.2-essentials_build\\bin\\ffmpeg.exe",
-        "CreateDirectoryForPlaylistFile": true,
-        "GetUrls": true,
-        "DownloadMusicFromUrlFile": true,
-        "DownloadMusicFromApi": true,
-        "SaveUrlsInFile": true,
-        "SaveBadUrlsInFile": true,
-        "DislikeForBadUrls": true,
-        "ErrorNumbersForUrl": 15,
-        "MaximumLengthInSeconds": 600
-      },
-    ]
+	"pathToClientSecretFile": "",
+	"playlists": [
+		{
+			"name": "DiscoPolo_download",
+			"path": "Z:\\MP3\\DiscoPolo_download",
+			"urls": {
+				"saveUrlsInFile": true,
+				"urlsFileName": "playlist_urls_discopolo.txt"
+			},
+			"download": {
+				"downloadMusicFromUrlFile": true,
+				"downloadMusicFromApi": true,
+				"saveBadUrlsDuringDownloadInFile": true,
+				"errorNumbersForUrl": 15,
+				"maximumLengthInSeconds": 600,
+				"urlsFileName": "playlist_urls_discopolo.txt",
+				"badUrlsFileName": "playlist_bad_urls_discopolo.txt",
+				"ffmpegPath": "C:\\Users\\Dawid\\Desktop\\ffmpeg-7.0.2-essentials_build\\bin\\ffmpeg.exe"
+			},
+			"dislikeBadUrls": {
+				"dislikeForBadUrls": true,
+				"badUrlsFileName": "playlist_bad_urls_discopolo.txt"
+			}
+		}
+	]
 }

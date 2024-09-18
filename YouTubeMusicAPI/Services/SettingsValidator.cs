@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,42 +8,42 @@ using YouTubeMusicAPI.Services.Interfaces;
 
 namespace YouTubeMusicAPI.Services
 {
-	internal class SettingsValidator : ISettingsValidator
-	{
-		IYTApiCommunicator _ytCommunicator;
+    internal class SettingsValidator : ISettingsValidator
+    {
+        IYTApiCommunicator _ytCommunicator;
+        //TODO: konstruktor z wsztrzykiwaniem
 
-		public (bool, string) CheckFFmpegFilePath(string path)
-		{
-			if (File.Exists(path))
-				return (true, "");
-			else
-				return (false, $"Invalid path to FFmpeg exe file: {path}");
-		}
+        public bool CheckIfFileExists(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return false;
+            if (File.Exists(path))
+                return true;
+            else
+                return false;
+        }
 
-		public (bool, string) CheckIfUrlFileExists(string path)
-		{
-			if (File.Exists(path))
-				return (true, "");
-			else
-				return (false, $"File with urls for playlist: {path} doesn't exist");
-		}
+        public bool CheckPath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return false;
+            if (Directory.Exists(path))
+                return true;
+            else
+                return false;
+        }
 
-		public (bool, string) CheckPath(string path)
-		{
-			if (Directory.Exists(path))
-				return (true, "");
-			else
-				return (false, $"Path {path} doesn't exist");
-		}
+        public async Task<bool> CheckPlaylistNameAsync(string playlistName)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+                return false;
 
-		public (bool, string) CheckPlaylistName(string playlistName)
-		{
-			var result = _ytCommunicator.GetPlaylistIdAsync(playlistName);
+            var result = await _ytCommunicator.GetPlaylistIdAsync(playlistName);
 
-			if (result == null)
-				return (false, $"Playlist {playlistName} doesn't exist");
-			else
-				return (true, "");
-		}
-	}
+            if (result == null)
+                return false;
+            else
+                return true;
+        }
+    }
 }
