@@ -1,16 +1,19 @@
 {
     "playlists": [
-        {
-            "Name": "nazwa_playlisty_1",
-            "Path": "path_to_directory",
-            "UrlsFileName": "filename_with_urls",
-            "BadUrlsFileName": "filename_bad_urls",
-            "GetUrls": true,
-            "DownloadMusic": true,
-            "SaveUrls": true,
-            "SaveBadUrls": true,
-            "DislikeForBadUrls": true,
-            "ErrorNumbersForUrl": 15
-        },
+      {
+        "Name": "DiscoPolo_download",
+        "Path": "Z:\MP3",
+        "UrlsFileName": "playlist_urls_discopolo",
+        "BadUrlsFileName": "playlist_bad_urls_discopolo",
+        "CreateDirectoryForPlaylistFile": true,
+        "GetUrls": true,
+        "DownloadMusicFromUrlFile": true,
+        "DownloadMusicFromApi":  true,
+        "SaveUrls": true,
+        "SaveBadUrls": true,
+        "DislikeForBadUrls": true,
+        "ErrorNumbersForUrl": 15,
+        "MaximumLengthInSeconds": 600,
+      },
     ]
 }
