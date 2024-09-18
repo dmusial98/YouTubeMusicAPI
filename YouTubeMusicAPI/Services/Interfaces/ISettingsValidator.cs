@@ -9,6 +9,6 @@ namespace YouTubeMusicAPI.Services.Interfaces
 {
     public interface ISettingsValidator
 	{
-		public Task<SettingsValidationResults> ValidateSettings(Settings settings);
+		public Task<SettingsValidationResults> ValidateSettingsAsync(Settings settings);
 	}
 }

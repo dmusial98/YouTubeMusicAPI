@@ -9,6 +9,7 @@ using YoutubeExplode.Videos.Streams;
 using YouTubeMusicAPI.Services;
 using YouTubeMusicAPI.Services.Interfaces;
 using YouTubeMusicAPI.SettingsStructure;
+using YouTubeMusicAPI.WorkPlan;
 
 namespace YouTubeMusicAPI
 {
@@ -76,7 +77,7 @@ namespace YouTubeMusicAPI
 
 		static ISettingsReader settingsReader;
 		static ISettingsValidator validator;
-		
+		static IWorkDispatcher workDispatcher
 
         static async Task Main(string[] args)
 		{
@@ -87,7 +88,10 @@ namespace YouTubeMusicAPI
 			Settings settings = await settingsReader.ReadSettingsAsync();
 			if (settings != null)
 			{
-				var validationSettingsResults = validator.ValidateSettings(settings);
+				var validationSettingsResults = await validator.ValidateSettingsAsync(settings);
+				var workPlan = workDispatcher.PlanWork(validationSettingsResults);
+
+
 			}
 			else
 				Logger.LogLeakOfSettings();
