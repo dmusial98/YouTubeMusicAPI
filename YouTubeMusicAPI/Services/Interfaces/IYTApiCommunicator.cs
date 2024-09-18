@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace YouTubeMusicAPI.Services.Interfaces
 {
-    internal interface IYTApiCommunicator
-    {
-    }
+	internal interface IYTApiCommunicator
+	{
+		public Task RemoveLikeForVideosAsync(string[] urls);
+		public Task<string?> GetPlaylistIdAsync(string playlistName);
+		public Task<string[]> GetUrlsFromPlaylistAsync(string playlistId);
+	}
 }

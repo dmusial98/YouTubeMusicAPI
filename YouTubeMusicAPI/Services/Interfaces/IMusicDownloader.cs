@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace YouTubeMusicAPI.Services.Interfaces
 {
-    internal interface IMusicDownloader
-    {
-    }
+	public interface IMusicDownloader
+	{
+		public Task<string> DownloadAudioAsMp3Async(string videoUrl);
+	}
 }

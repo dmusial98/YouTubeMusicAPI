@@ -10,14 +10,14 @@ using YouTubeMusicAPI.SettingsStructure;
 
 namespace YouTubeMusicAPI.Services
 {
-    internal class SettingsReader : ISettingsReader
-    {
-        readonly string settingsFilePath = String.Concat(Directory.GetCurrentDirectory(), "settings.json");
+	internal class SettingsReader : ISettingsReader
+	{
+		readonly string settingsFilePath = String.Concat(Directory.GetCurrentDirectory(), "settings.json");
 
-        public async Task<Settings> ReadSettingsAsync()
-        {
-            var fileStr = await File.ReadAllTextAsync(settingsFilePath);
-            return JsonSerializer.Deserialize<Settings>(fileStr);
-        }
-    }
+		public async Task<Settings> ReadSettingsAsync()
+		{
+			var fileStr = await File.ReadAllTextAsync(settingsFilePath);
+			return JsonSerializer.Deserialize<Settings>(fileStr);
+		}
+	}
 }

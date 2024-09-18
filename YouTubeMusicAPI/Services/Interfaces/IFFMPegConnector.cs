@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace YouTubeMusicAPI.Services.Interfaces
 {
-    internal interface IFFMPegConnector
+    public interface IFFmpegConnector
     {
+      public void ConvertToMp3(string inputFilePath, string outputFilePath);
     }
 }

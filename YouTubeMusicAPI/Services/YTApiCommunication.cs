@@ -5,10 +5,11 @@ using Google.Apis.YouTube.v3;
 using System.Collections.Specialized;
 using System.Text;
 using TagLib;
+using YouTubeMusicAPI.Services.Interfaces;
 
 namespace YouTubeMusicAPI.Services
 {
-    public class YTApiCommunication
+    public class YTApiCommunication : IYTApiCommunicator
     {
         public string credentialsFileName { get; set; }
         UserCredential _credential;
@@ -37,7 +38,7 @@ namespace YouTubeMusicAPI.Services
             }
         }
 
-        public async Task RemoveLikeForVideos(string[] urls)
+        public async Task RemoveLikeForVideosAsync(string[] urls)
         {
             await SetUp();
 
@@ -60,7 +61,7 @@ namespace YouTubeMusicAPI.Services
 
         }
 
-        public async Task<string?> GetPlaylistId(string playlistName)
+        public async Task<string?> GetPlaylistIdAsync(string playlistName)
         {
             await SetUp();
 
@@ -71,7 +72,7 @@ namespace YouTubeMusicAPI.Services
             return response.Items.FirstOrDefault(p => p.Snippet.Title == playlistName)?.Id;
         }
 
-        public async Task<string[]> GetUrlsFromPlaylist(string playlistId)
+        public async Task<string[]> GetUrlsFromPlaylistAsync(string playlistId)
         {
             await SetUp();
 

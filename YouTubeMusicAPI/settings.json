@@ -2,18 +2,19 @@
     "playlists": [
       {
         "Name": "DiscoPolo_download",
-        "Path": "Z:\MP3",
+        "Path": "Z:\\MP3",
         "UrlsFileName": "playlist_urls_discopolo",
         "BadUrlsFileName": "playlist_bad_urls_discopolo",
+        "FFmpegPath": "C:\\Users\\Dawid\\Desktop\\ffmpeg-7.0.2-essentials_build\\bin\\ffmpeg.exe",
         "CreateDirectoryForPlaylistFile": true,
         "GetUrls": true,
         "DownloadMusicFromUrlFile": true,
-        "DownloadMusicFromApi":  true,
-        "SaveUrls": true,
-        "SaveBadUrls": true,
+        "DownloadMusicFromApi": true,
+        "SaveUrlsInFile": true,
+        "SaveBadUrlsInFile": true,
         "DislikeForBadUrls": true,
         "ErrorNumbersForUrl": 15,
-        "MaximumLengthInSeconds": 600,
+        "MaximumLengthInSeconds": 600
       },
     ]
 }
