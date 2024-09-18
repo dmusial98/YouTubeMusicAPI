@@ -76,16 +76,7 @@ namespace YouTubeMusicAPI
 
 		static ISettingsReader settingsReader;
 		static ISettingsValidator validator;
-		static bool wasIncorrectPlaylistPath = false;
-		static bool wasIncorrectPlaylistName = false;
-		static bool wasIncorrectFFmpegPath = false;
-		static bool wasIncorrectUrlFileToDownload = false;
-		private static bool wasIncorrectPathToClientSecretFile = false;
-		private static bool wasIncorrectUrlFileToSave = false;
-		private static bool wasIncorrectBadUrlsFileNameToSave = false;
-		private static bool wasIncorrectErrorsNumberForUrl = false;
-		private static bool wasIncorrectMaximumLengthInSeconds = false;
-        private static bool wasIncorrectBadUrlsFileNameToDislike = false;
+		
 
         static async Task Main(string[] args)
 		{
@@ -96,76 +87,7 @@ namespace YouTubeMusicAPI
 			Settings settings = await settingsReader.ReadSettingsAsync();
 			if (settings != null)
 			{
-				if (String.IsNullOrEmpty(settings.pathToClientSecretFile))
-					settings.pathToClientSecretFile = Directory.GetCurrentDirectory();
-
-				if (validator.CheckIfFileExists(settings.pathToClientSecretFile))
-				{
-					Logger.LogInvalidPathToClientSecretFile(settings.pathToClientSecretFile);
-					wasIncorrectPathToClientSecretFile = true;
-				}
-
-				foreach (var playlist in settings.playlists)
-				{
-					if (!(await validator.CheckPlaylistNameAsync(playlist.name)))
-					{
-						Logger.LogInvalidNameOfPlaylist(playlist.name);
-						wasIncorrectPlaylistName = true;
-					}
-
-					if (String.IsNullOrEmpty(playlist.path))
-						playlist.path = Directory.GetCurrentDirectory();
-
-					if (!validator.CheckPath(playlist.path))
-					{
-						Logger.LogInvalidPathInSettings(playlist.path);
-						wasIncorrectPlaylistPath = true;
-					}
-
-					if (playlist.urls != null && playlist.urls.saveUrlsInFile && String.IsNullOrEmpty(playlist.urls.urlsFileName))
-					{
-						Logger.LogLeakOfUrlFileNameToSave(playlist.urls.urlsFileName);
-						wasIncorrectUrlFileToSave = true;
-					}
-
-					if (playlist.download != null)
-					{
-						if ((playlist.download.downloadMusicFromApi || playlist.download.downloadMusicFromUrlFile) &&
-							!validator.CheckIfFileExists(playlist.download.ffmpegPath))
-						{
-							Logger.LogInvalidPathToFFmpeg(playlist.download.ffmpegPath);
-							wasIncorrectFFmpegPath = true;
-						}
-						if (playlist.download.downloadMusicFromUrlFile &&
-							!validator.CheckIfFileExists(Path.Combine(playlist.path, playlist.download.urlsFileName)))
-						{
-							Logger.LogInvalidUrlFileName(Path.Combine(playlist.path, playlist.download.urlsFileName));
-							wasIncorrectUrlFileToDownload = true;
-						}
-						if (playlist.download.saveBadUrlsDuringDownloadInFile && String.IsNullOrEmpty(playlist.download.badUrlsFileName))
-						{
-							Logger.LogIncorrectBadUrlsFileNameToSave(playlist.download.badUrlsFileName);
-							wasIncorrectBadUrlsFileNameToSave = true;
-						}
-						if (playlist.download.errorNumbersForUrl < 0)
-						{
-							Logger.LogIncorrectNumberOfErrorsForUrl(playlist.download.errorNumbersForUrl);
-							wasIncorrectErrorsNumberForUrl = true;
-						}
-						if(playlist.download.maximumLengthInSeconds <= 0)
-						{
-							Logger.LogIncorrectMaximumLengthInSeconds(playlist.download.maximumLengthInSeconds);
-							wasIncorrectMaximumLengthInSeconds = true;
-						}
-					}
-
-					if (playlist.dislikeForBadUrls != null && playlist.dislikeForBadUrls.dislikeForBadUrls 
-						&& !validator.CheckIfFileExists(Path.Combine(playlist.path, playlist.dislikeForBadUrls.badUrlsFileName)))
-					{
-						Logger.LogIncorrectBadUrlsFileNameToDislike(Path.Combine(playlist.path, playlist.dislikeForBadUrls.badUrlsFileName));
-						wasIncorrectBadUrlsFileNameToDislike = true;
-					}
-				}
+				var validationSettingsResults = validator.ValidateSettings(settings);
 			}
 			else
 				Logger.LogLeakOfSettings();

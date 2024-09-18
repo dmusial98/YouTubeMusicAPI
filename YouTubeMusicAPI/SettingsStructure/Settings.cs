@@ -9,6 +9,6 @@ namespace YouTubeMusicAPI.SettingsStructure
 	public class Settings
 	{
 		public string? pathToClientSecretFile { get; set; }
-		public Playlist[] playlists { get; set; }
+		public PlaylistSettings[] playlists { get; set; }
 	}
 }

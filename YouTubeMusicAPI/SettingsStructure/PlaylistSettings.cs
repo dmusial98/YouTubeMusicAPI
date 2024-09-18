@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace YouTubeMusicAPI.SettingsStructure
 {
-	public class Playlist
+	public class PlaylistSettings
 	{
 		public string? name { get; set; }
 		public string? path { get; set; }
