@@ -78,8 +78,10 @@ namespace YouTubeMusicAPI
 		static ISettingsReader settingsReader;
 		static ISettingsValidator validator;
 		static IWorkDispatcher workDispatcher;
+		static IYTApiCommunicator communicator;
+		static IUrlFileReader urlFileReader;
 
-        static async Task Main(string[] args)
+		static async Task Main(string[] args)
 		{
 			//DependencyInjection
 
@@ -94,7 +96,22 @@ namespace YouTubeMusicAPI
 
 				if(workPlan != null && workPlan.playlistWorkList.Length > 0)
 				{
+                    foreach (var playlist in workPlan.playlistWorkList)
+					{
+						string[] urlsFromPlaylistYTApi;
+						string[] urlsFromUrlFile;
 
+						if(playlist.SaveUrlsInFile || playlist.DownloadMusicFromApi)
+						{
+							var playlistId = await communicator.GetPlaylistIdAsync(playlist.PlaylistName);
+                            urlsFromPlaylistYTApi = await communicator.GetUrlsFromPlaylistAsync(playlistId);
+                        }
+
+						if(playlist.DownloadMusicFromUrlFile)
+						{
+							urlsFromUrlFile = await urlFileReader.ReadUrlsFromFileAsync(playlist.UrlFileNameToRead);
+						}
+					}
 				}
 			}
 			else
@@ -161,6 +178,9 @@ namespace YouTubeMusicAPI
 			await File.WriteAllLinesAsync(@"Z:\MP3\badUrls.txt", invalidVideosUrls);
 
 		}
+
+
+
 
 		static async Task<List<string>> GetVideoUrlsFromPlaylist(YouTubeService youtubeService, string playlistId)
 		{

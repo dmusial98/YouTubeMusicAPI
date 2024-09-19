@@ -39,12 +39,18 @@ namespace YouTubeMusicAPI.WorkPlan
                 bool saveBadUrlsDuringDownloadInFile = true;
                 bool dislikeForBadUrls = true;
 
-                //ifologia
+                string UrlFileNameToSave = "";
+                string UrlFileNameToRead = "";
+                string BadUrlsFileNameToWrite = "";
+
                 if (!playlist.PlaylistReadSettings.urls.saveUrlsInFile ||
                     playlist.wasIncorrectPlaylistPath ||
                     playlist.wasIncorrectPlaylistName ||
                     playlist.wasIncorrectUrlFileToSave)
+                {
                     saveUrlsInFile = false;
+                    UrlFileNameToSave = playlist.PlaylistReadSettings.urls.urlsFileName;
+                }
                 if (!playlist.PlaylistReadSettings.download.downloadMusicFromUrlFile ||
                     playlist.wasIncorrectFFmpegPath ||
                     playlist.wasIncorrectPlaylistPath ||
@@ -52,7 +58,11 @@ namespace YouTubeMusicAPI.WorkPlan
                     playlist.wasIncorrectUrlFileToDownload ||
                     playlist.wasIncorrectErrorsNumberForUrl ||
                     playlist.wasIncorrectMaximumLengthInSeconds)
+                {
                     downloadMusicFromUrlFile = false;
+                    UrlFileNameToRead = playlist.PlaylistReadSettings.download.urlsFileName;
+                }
+
                 if (!playlist.PlaylistReadSettings.download.downloadMusicFromApi ||
                     playlist.wasIncorrectFFmpegPath ||
                     playlist.wasIncorrectPlaylistPath ||
@@ -60,21 +70,28 @@ namespace YouTubeMusicAPI.WorkPlan
                     playlist.wasIncorrectErrorsNumberForUrl ||
                     playlist.wasIncorrectMaximumLengthInSeconds)
                     downloadMusicFromApi = false;
-                if ((!downloadMusicFromApi && !downloadMusicFromUrlFile) || 
+
+                if ((!downloadMusicFromApi && !downloadMusicFromUrlFile) ||
                     playlist.wasIncorrectBadUrlsFileNameToSave)
+                {
                     saveBadUrlsDuringDownloadInFile = false;
+                    BadUrlsFileNameToWrite = playlist.PlaylistReadSettings.download.badUrlsFileName;
+                }
                 if (!playlist.PlaylistReadSettings.dislikeForBadUrls.dislikeForBadUrls ||
                     playlist.wasIncorrectPlaylistPath ||
                     playlist.wasIncorrectBadUrlsFileNameToDislike)
                     dislikeForBadUrls = false;
 
-                //dodaj do listy workElement
                 list.Add(new(playlist.PlaylistReadSettings.name,
                     saveUrlsInFile,
                     downloadMusicFromUrlFile,
                     downloadMusicFromApi,
                     saveBadUrlsDuringDownloadInFile,
                     dislikeForBadUrls));
+
+                list.Last().UrlFileNameToRead = UrlFileNameToRead;
+                list.Last().UrlFileNameToSave = UrlFileNameToSave;
+                list.Last().BadUrlsFileNameToWrite = BadUrlsFileNameToWrite;
             }
 
             return new WorkList(list.ToArray());

@@ -3,6 +3,9 @@
     public class PlaylistWorkList
     {
         public string PlaylistName { get; }
+        public string UrlFileNameToSave { get; set; }
+        public string UrlFileNameToRead { get; set; }
+        public string BadUrlsFileNameToWrite { get; set; }
         public bool SaveUrlsInFile { get; }
         public bool DownloadMusicFromUrlFile { get; }
         public bool DownloadMusicFromApi { get; }
