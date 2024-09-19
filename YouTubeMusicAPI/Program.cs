@@ -77,7 +77,7 @@ namespace YouTubeMusicAPI
 
 		static ISettingsReader settingsReader;
 		static ISettingsValidator validator;
-		static IWorkDispatcher workDispatcher
+		static IWorkDispatcher workDispatcher;
 
         static async Task Main(string[] args)
 		{
@@ -89,9 +89,13 @@ namespace YouTubeMusicAPI
 			if (settings != null)
 			{
 				var validationSettingsResults = await validator.ValidateSettingsAsync(settings);
+				Logger.LogErrorsInSettings(validationSettingsResults);
 				var workPlan = workDispatcher.PlanWork(validationSettingsResults);
 
+				if(workPlan != null && workPlan.playlistWorkList.Length > 0)
+				{
 
+				}
 			}
 			else
 				Logger.LogLeakOfSettings();

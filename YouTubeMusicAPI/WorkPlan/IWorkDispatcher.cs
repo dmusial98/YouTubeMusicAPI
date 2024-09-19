@@ -10,5 +10,7 @@ namespace YouTubeMusicAPI.WorkPlan
     public interface IWorkDispatcher
     {
         public WorkList PlanWork(SettingsValidationResults validationResults);
+
+    public void SaveUrlsInFile();
     }
 }
