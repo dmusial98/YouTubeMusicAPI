@@ -36,7 +36,7 @@ namespace YouTubeMusicAPI
 						 services.AddTransient<ISettingsValidator, SettingsValidator>();
 						 services.AddTransient<ITagger, Tagger>();
 						 services.AddTransient<IUrlFileReaderWriter, UrlFileReaderWriter>();
-						 services.AddTransient<IYTApiCommunicator, YTApiCommunicator>();
+						 services.AddSingleton<IYTApiCommunicator, YTApiCommunicator>();
 						 services.AddTransient<IWorkDispatcher, WorkDispatcher>();
 
 						 services.AddTransient<App>(); // Rejestrujemy klasę App, która korzysta z wstrzykniętych zależności

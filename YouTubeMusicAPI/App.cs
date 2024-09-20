@@ -53,6 +53,7 @@ namespace YouTubeMusicAPI
 
 						if (playlist.SaveUrlsInFile || playlist.DownloadMusicFromApi)
 						{
+							
 							var playlistId = await ytApiCommunicator.GetPlaylistIdAsync(playlist.PlaylistName);
 							urlsFromPlaylistYTApi = await ytApiCommunicator.GetUrlsFromPlaylistAsync(playlistId);
 						}

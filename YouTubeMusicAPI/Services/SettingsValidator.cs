@@ -13,21 +13,22 @@ namespace YouTubeMusicAPI.Services
 	internal class SettingsValidator : ISettingsValidator
 	{
 		IYTApiCommunicator _ytCommunicator;
-		//TODO: konstruktor z wsztrzykiwaniem
 
 		public SettingsValidator(IYTApiCommunicator ytCommunicator)
 		{
 			_ytCommunicator = ytCommunicator;
-		}
+        }
 
 		public async Task<SettingsValidationResults> ValidateSettingsAsync(Settings settings)
 		{
-			SettingsValidationResults results = new(settings.pathToClientSecretFile);
-
 			if (String.IsNullOrEmpty(settings.pathToClientSecretFile))
-				settings.pathToClientSecretFile = Directory.GetCurrentDirectory();
+				settings.pathToClientSecretFile = Path.Combine(Directory.GetCurrentDirectory(), "client_secret.json");
 
-			if (CheckIfFileExists(settings.pathToClientSecretFile))
+            SettingsValidationResults results = new(settings.pathToClientSecretFile);
+
+			_ytCommunicator.credentialsFileName = settings.pathToClientSecretFile;
+
+            if (!CheckIfFileExists(settings.pathToClientSecretFile))
 			{
 				Logger.LogInvalidPathToClientSecretFile(settings.pathToClientSecretFile);
 				results.wasIncorrectPathToClientSecretFile = true;

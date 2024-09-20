@@ -12,7 +12,7 @@ namespace YouTubeMusicAPI.Services
 {
 	internal class SettingsReader : ISettingsReader
 	{
-		readonly string settingsFilePath = String.Concat(Directory.GetCurrentDirectory(), "settings.json");
+		readonly string settingsFilePath = Path.Combine(Directory.GetCurrentDirectory(), "settings.json");
 
 		public async Task<Settings> ReadSettingsAsync()
 		{

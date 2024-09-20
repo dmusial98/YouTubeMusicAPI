@@ -50,23 +50,22 @@ namespace YouTubeMusicAPI.WorkPlan
 						playlist.wasIncorrectPlaylistPath ||
 						playlist.wasIncorrectPlaylistName ||
 						playlist.wasIncorrectUrlFileToSave)
-				{
 					saveUrlsInFile = false;
-					UrlFileNameToSave = playlist.PlaylistReadSettings.urls.urlsFileName;
-				}
-				if (!playlist.PlaylistReadSettings.download.downloadMusicFromUrlFile ||
+				else
+                    UrlFileNameToSave = playlist.PlaylistReadSettings.urls.urlsFileName;
+
+                if (!playlist.PlaylistReadSettings.download.downloadMusicFromUrlFile ||
 						playlist.wasIncorrectFFmpegPath ||
 						playlist.wasIncorrectPlaylistPath ||
 						//playlist.wasIncorrectPlaylistName ||
 						playlist.wasIncorrectUrlFileToDownload ||
 						playlist.wasIncorrectErrorsNumberForUrl ||
 						playlist.wasIncorrectMaximumLengthInSeconds)
-				{
 					downloadMusicFromUrlFile = false;
-					UrlFileNameToRead = playlist.PlaylistReadSettings.download.urlsFileName;
-				}
+				else
+                    UrlFileNameToRead = playlist.PlaylistReadSettings.download.urlsFileName;
 
-				if (!playlist.PlaylistReadSettings.download.downloadMusicFromApi ||
+                if (!playlist.PlaylistReadSettings.download.downloadMusicFromApi ||
 						playlist.wasIncorrectFFmpegPath ||
 						playlist.wasIncorrectPlaylistPath ||
 						playlist.wasIncorrectPlaylistName ||
@@ -74,13 +73,14 @@ namespace YouTubeMusicAPI.WorkPlan
 						playlist.wasIncorrectMaximumLengthInSeconds)
 					downloadMusicFromApi = false;
 
-				if ((!downloadMusicFromApi && !downloadMusicFromUrlFile) ||
+				if (!playlist.PlaylistReadSettings.download.saveBadUrlsDuringDownloadInFile ||
+					(!downloadMusicFromApi && !downloadMusicFromUrlFile) ||
 						playlist.wasIncorrectBadUrlsFileNameToSave)
-				{
 					saveBadUrlsDuringDownloadInFile = false;
-					BadUrlsFileNameToWrite = playlist.PlaylistReadSettings.download.badUrlsFileName;
-				}
-				if (!playlist.PlaylistReadSettings.dislikeForBadUrls.dislikeForBadUrls ||
+				else
+                    BadUrlsFileNameToWrite = playlist.PlaylistReadSettings.download.badUrlsFileName;
+
+                if (!playlist.PlaylistReadSettings.dislikeForBadUrls.dislikeForBadUrls ||
 						playlist.wasIncorrectPlaylistPath ||
 						playlist.wasIncorrectBadUrlsFileNameToDislike)
 					dislikeForBadUrls = false;
