@@ -7,94 +7,96 @@ using YouTubeMusicAPI.SettingsStructure;
 
 namespace YouTubeMusicAPI.WorkPlan
 {
-    public class WorkDispatcher : IWorkDispatcher
-    {
-        public WorkList PlanWork(SettingsValidationResults validationResults)
-        {
-            if (validationResults.wasIncorrectPathToClientSecretFile)
-            {
-                List<PlaylistWorkList> _list = new List<PlaylistWorkList>();
-                foreach (var playlist in validationResults.settingsValidationPlaylistResults)
-                {
-                    _list.Add(new PlaylistWorkList(
-                         playlistName: playlist.PlaylistReadSettings.name,
-                         false,
-                         false,
-                         false,
-                         false,
-                         false
-                     ));
-                }
+	public class WorkDispatcher : IWorkDispatcher
+	{
+		public WorkList PlanWork(SettingsValidationResults validationResults)
+		{
+			if (validationResults.wasIncorrectPathToClientSecretFile)
+			{
+				List<PlaylistWorkList> _list = new List<PlaylistWorkList>();
+				foreach (var playlist in validationResults.settingsValidationPlaylistResults)
+				{
+					_list.Add(new PlaylistWorkList(
+							 playlistName: playlist.PlaylistReadSettings.name,
+							 string.Empty,
+							 string.Empty,
+							 string.Empty,
+							 false,
+							 false,
+							 false,
+							 false,
+							 false
+					 ));
+				}
 
-                return new WorkList(_list.ToArray());
-            }
+				return new WorkList(_list.ToArray());
+			}
 
-            List<PlaylistWorkList> list = new List<PlaylistWorkList>();
+			List<PlaylistWorkList> list = new List<PlaylistWorkList>();
 
-            foreach (var playlist in validationResults.settingsValidationPlaylistResults)
-            {
-                bool saveUrlsInFile = true;
-                bool downloadMusicFromUrlFile = true;
-                bool downloadMusicFromApi = true;
-                bool saveBadUrlsDuringDownloadInFile = true;
-                bool dislikeForBadUrls = true;
+			foreach (var playlist in validationResults.settingsValidationPlaylistResults)
+			{
+				bool saveUrlsInFile = true;
+				bool downloadMusicFromUrlFile = true;
+				bool downloadMusicFromApi = true;
+				bool saveBadUrlsDuringDownloadInFile = true;
+				bool dislikeForBadUrls = true;
 
-                string UrlFileNameToSave = "";
-                string UrlFileNameToRead = "";
-                string BadUrlsFileNameToWrite = "";
+				string UrlFileNameToSave = "";
+				string UrlFileNameToRead = "";
+				string BadUrlsFileNameToWrite = "";
 
-                if (!playlist.PlaylistReadSettings.urls.saveUrlsInFile ||
-                    playlist.wasIncorrectPlaylistPath ||
-                    playlist.wasIncorrectPlaylistName ||
-                    playlist.wasIncorrectUrlFileToSave)
-                {
-                    saveUrlsInFile = false;
-                    UrlFileNameToSave = playlist.PlaylistReadSettings.urls.urlsFileName;
-                }
-                if (!playlist.PlaylistReadSettings.download.downloadMusicFromUrlFile ||
-                    playlist.wasIncorrectFFmpegPath ||
-                    playlist.wasIncorrectPlaylistPath ||
-                    //playlist.wasIncorrectPlaylistName ||
-                    playlist.wasIncorrectUrlFileToDownload ||
-                    playlist.wasIncorrectErrorsNumberForUrl ||
-                    playlist.wasIncorrectMaximumLengthInSeconds)
-                {
-                    downloadMusicFromUrlFile = false;
-                    UrlFileNameToRead = playlist.PlaylistReadSettings.download.urlsFileName;
-                }
+				if (!playlist.PlaylistReadSettings.urls.saveUrlsInFile ||
+						playlist.wasIncorrectPlaylistPath ||
+						playlist.wasIncorrectPlaylistName ||
+						playlist.wasIncorrectUrlFileToSave)
+				{
+					saveUrlsInFile = false;
+					UrlFileNameToSave = playlist.PlaylistReadSettings.urls.urlsFileName;
+				}
+				if (!playlist.PlaylistReadSettings.download.downloadMusicFromUrlFile ||
+						playlist.wasIncorrectFFmpegPath ||
+						playlist.wasIncorrectPlaylistPath ||
+						//playlist.wasIncorrectPlaylistName ||
+						playlist.wasIncorrectUrlFileToDownload ||
+						playlist.wasIncorrectErrorsNumberForUrl ||
+						playlist.wasIncorrectMaximumLengthInSeconds)
+				{
+					downloadMusicFromUrlFile = false;
+					UrlFileNameToRead = playlist.PlaylistReadSettings.download.urlsFileName;
+				}
 
-                if (!playlist.PlaylistReadSettings.download.downloadMusicFromApi ||
-                    playlist.wasIncorrectFFmpegPath ||
-                    playlist.wasIncorrectPlaylistPath ||
-                    playlist.wasIncorrectPlaylistName ||
-                    playlist.wasIncorrectErrorsNumberForUrl ||
-                    playlist.wasIncorrectMaximumLengthInSeconds)
-                    downloadMusicFromApi = false;
+				if (!playlist.PlaylistReadSettings.download.downloadMusicFromApi ||
+						playlist.wasIncorrectFFmpegPath ||
+						playlist.wasIncorrectPlaylistPath ||
+						playlist.wasIncorrectPlaylistName ||
+						playlist.wasIncorrectErrorsNumberForUrl ||
+						playlist.wasIncorrectMaximumLengthInSeconds)
+					downloadMusicFromApi = false;
 
-                if ((!downloadMusicFromApi && !downloadMusicFromUrlFile) ||
-                    playlist.wasIncorrectBadUrlsFileNameToSave)
-                {
-                    saveBadUrlsDuringDownloadInFile = false;
-                    BadUrlsFileNameToWrite = playlist.PlaylistReadSettings.download.badUrlsFileName;
-                }
-                if (!playlist.PlaylistReadSettings.dislikeForBadUrls.dislikeForBadUrls ||
-                    playlist.wasIncorrectPlaylistPath ||
-                    playlist.wasIncorrectBadUrlsFileNameToDislike)
-                    dislikeForBadUrls = false;
+				if ((!downloadMusicFromApi && !downloadMusicFromUrlFile) ||
+						playlist.wasIncorrectBadUrlsFileNameToSave)
+				{
+					saveBadUrlsDuringDownloadInFile = false;
+					BadUrlsFileNameToWrite = playlist.PlaylistReadSettings.download.badUrlsFileName;
+				}
+				if (!playlist.PlaylistReadSettings.dislikeForBadUrls.dislikeForBadUrls ||
+						playlist.wasIncorrectPlaylistPath ||
+						playlist.wasIncorrectBadUrlsFileNameToDislike)
+					dislikeForBadUrls = false;
 
-                list.Add(new(playlist.PlaylistReadSettings.name,
-                    saveUrlsInFile,
-                    downloadMusicFromUrlFile,
-                    downloadMusicFromApi,
-                    saveBadUrlsDuringDownloadInFile,
-                    dislikeForBadUrls));
+				list.Add(new(playlist.PlaylistReadSettings.name,
+					UrlFileNameToSave,
+					UrlFileNameToRead,
+					BadUrlsFileNameToWrite,
+					saveUrlsInFile,
+					downloadMusicFromUrlFile,
+					downloadMusicFromApi,
+					saveBadUrlsDuringDownloadInFile,
+					dislikeForBadUrls));
+			}
 
-                list.Last().UrlFileNameToRead = UrlFileNameToRead;
-                list.Last().UrlFileNameToSave = UrlFileNameToSave;
-                list.Last().BadUrlsFileNameToWrite = BadUrlsFileNameToWrite;
-            }
-
-            return new WorkList(list.ToArray());
-        }
-    }
+			return new WorkList(list.ToArray());
+		}
+	}
 }

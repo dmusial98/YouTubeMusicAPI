@@ -8,7 +8,7 @@ using YouTubeMusicAPI.SettingsStructure;
 
 namespace YouTubeMusicAPI.Services.Interfaces
 {
-    internal interface ISettingsReader
+    public interface ISettingsReader
     {
         public Task<Settings> ReadSettingsAsync();
 

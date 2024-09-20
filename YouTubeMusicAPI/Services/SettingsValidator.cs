@@ -15,6 +15,11 @@ namespace YouTubeMusicAPI.Services
 		IYTApiCommunicator _ytCommunicator;
 		//TODO: konstruktor z wsztrzykiwaniem
 
+		public SettingsValidator(IYTApiCommunicator ytCommunicator)
+		{
+			_ytCommunicator = ytCommunicator;
+		}
+
 		public async Task<SettingsValidationResults> ValidateSettingsAsync(Settings settings)
 		{
 			SettingsValidationResults results = new(settings.pathToClientSecretFile);

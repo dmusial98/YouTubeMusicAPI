@@ -81,5 +81,14 @@ namespace YouTubeMusicAPI.Services
 
 		public static void LogIncorrectBadUrlsFileNameToDislike(string badUrlsFileName) =>
 			Console.WriteLine($"Incorrect bad urls file name to dislike: {badUrlsFileName}");
+
+		public static void LogTooLongSong(string v) =>
+			Console.WriteLine($"{v} haven't been downloaded with duration {{video.Duration.Value.TotalMinutes}} minutes\"");
+
+		public static void LogDownloadedSong(string mp3FilePath) =>
+			Console.WriteLine($"{mp3FilePath} downloaded");
+
+		public static void LogExceptionDuringDownload(string videoUrl, Exception e) =>
+			Console.WriteLine($"{videoUrl} -> {e.Message}");
 	}
 }

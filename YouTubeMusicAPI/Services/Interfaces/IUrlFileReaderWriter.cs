@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace YouTubeMusicAPI.Services.Interfaces
 {
-	public interface IMusicDownloader
+	public interface IUrlFileReaderWriter
 	{
-		//public Task DownloadSingleAudioAsMp3Async(string videoUrl);
-		public Task DownloadAudiosAsMp3Async(string[] urls);
+		public Task<string[]> ReadUrlsFromFileAsync(string path);
+		public Task SaveUrlsInFileAsync(string filename, string[] urls);
 	}
 }

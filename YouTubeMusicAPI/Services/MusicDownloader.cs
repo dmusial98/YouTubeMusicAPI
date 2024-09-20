@@ -13,14 +13,32 @@ namespace YouTubeMusicAPI.Services
 {
 	public class MusicDownloader : IMusicDownloader
 	{
-		public Dictionary<string, int> errorsNumbersDictionary { get; set; } = new();
-		public string DirectoryPath { get; set; }
-		public string FFMPEGPath { get; set; }
 		IFFmpegConnector _ffmpegConnector;
 		ITagger _tagger;
 
+		public Dictionary<string, int> errorsNumbersDictionary { get; set; } = new();
+		public string DirectoryPath { get; set; }
+		public string FFMPEGPath { get; set; }
+		public int errorsNumberForSingleSong { get; set; } = 15;
 
-		public async Task<string> DownloadAudioAsMp3Async(string videoUrl)
+		public MusicDownloader(IFFmpegConnector ffmpegConnector, ITagger tagger)
+		{
+			_ffmpegConnector = ffmpegConnector;
+			_tagger = tagger;
+		}
+
+		public async Task DownloadAudiosAsMp3Async(string[] urls)
+		{
+			foreach (var url in urls)
+			{
+				var result = true;
+				do
+					result = await DownloadSingleAudioAsMp3Async(url);
+				while (!result && errorsNumbersDictionary[url] < errorsNumberForSingleSong);
+			}
+		}
+
+		private async Task<bool> DownloadSingleAudioAsMp3Async(string videoUrl)
 		{
 			try
 			{
@@ -28,7 +46,7 @@ namespace YouTubeMusicAPI.Services
 				var video = await youtube.Videos.GetAsync(videoUrl);
 
 				if (video.Duration.Value.TotalSeconds > 600)
-					return $"{video.Author} - {video.Title} haven't been downloaded with duration {video.Duration.Value.TotalMinutes} minutes";
+					Logger.LogTooLongSong($"{video.Author} - {video.Title}");
 
 				string author = RemoveTopicAndPrecedingChars(video.Author.ToString());
 				string filename = RemoveInvalidPathChars($"{author} - {video.Title}");
@@ -57,7 +75,8 @@ namespace YouTubeMusicAPI.Services
 
 				_tagger.DoTagsInFile(video, author, mp3FilePath);
 
-				return mp3FilePath;
+				Logger.LogDownloadedSong(mp3FilePath);
+				return true;
 			}
 			catch (Exception e)
 			{
@@ -67,7 +86,8 @@ namespace YouTubeMusicAPI.Services
 				{
 					errorsNumbersDictionary.Add(videoUrl, 1);
 				}
-				return $"Exception -> {e.Message} {videoUrl}";
+				Logger.LogExceptionDuringDownload(videoUrl, e);
+				return false;
 			}
 		}
 
