@@ -38,8 +38,11 @@ namespace YouTubeMusicAPI.Services
 			{
 				results.settingsValidationPlaylistResults.Add(new SettingsValidationPlaylistResults(playlist));
 
-				if (!(await CheckPlaylistNameAsync(playlist.name)))
-					results.settingsValidationPlaylistResults.Last().wasIncorrectPlaylistName = true;
+				if (playlist.name != "LL")
+				{
+					if (!(await CheckPlaylistNameAsync(playlist.name)))
+						results.settingsValidationPlaylistResults.Last().wasIncorrectPlaylistName = true;
+				}
 
 				if (String.IsNullOrEmpty(playlist.path))
 					playlist.path = Directory.GetCurrentDirectory();

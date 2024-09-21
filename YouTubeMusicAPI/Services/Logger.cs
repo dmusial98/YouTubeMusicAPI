@@ -85,10 +85,16 @@ namespace YouTubeMusicAPI.Services
 		public static void LogTooLongSong(string v) =>
 			Console.WriteLine($"{v} haven't been downloaded with duration {{video.Duration.Value.TotalMinutes}} minutes\"");
 
-		public static void LogDownloadedSong(string mp3FilePath) =>
-			Console.WriteLine($"{mp3FilePath} downloaded");
+		public static void LogDownloadedSong(int counter, string mp3FilePath) =>
+			Console.WriteLine($"{counter}. {mp3FilePath} downloaded");
 
 		public static void LogExceptionDuringDownload(string videoUrl, Exception e) =>
 			Console.WriteLine($"{videoUrl} -> {e.Message}");
-	}
+
+		public static void LogStartDownloadingSongs(int songsCount) =>
+			Console.WriteLine($"Start downloading {songsCount} songs");
+
+		public static void LogEndOfWork() =>
+			Console.WriteLine("Program ends work, type Enter key to end");
+    }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,10 +17,12 @@ namespace YouTubeMusicAPI.Services
 		IFFmpegConnector _ffmpegConnector;
 		ITagger _tagger;
 
-		public Dictionary<string, int> errorsNumbersDictionary { get; set; } = new();
+		public Dictionary<string, int> ErrorsNumbersDictionary { get; set; } = new();
 		public string DirectoryPath { get; set; }
-		public string FFMPEGPath { get; set; }
+		public string FFmpegPath { get; set; }
 		public int errorsNumberForSingleSong { get; set; } = 15;
+
+		private int counter = 0;
 
 		public MusicDownloader(IFFmpegConnector ffmpegConnector, ITagger tagger)
 		{
@@ -29,12 +32,15 @@ namespace YouTubeMusicAPI.Services
 
 		public async Task DownloadAudiosAsMp3Async(string[] urls)
 		{
+			Logger.LogStartDownloadingSongs(urls.Length);
+			counter = 0;
+
 			foreach (var url in urls)
 			{
 				var result = true;
 				do
 					result = await DownloadSingleAudioAsMp3Async(url);
-				while (!result && errorsNumbersDictionary[url] < errorsNumberForSingleSong);
+				while (!result && ErrorsNumbersDictionary[url] < errorsNumberForSingleSong);
 			}
 		}
 
@@ -67,6 +73,7 @@ namespace YouTubeMusicAPI.Services
 					}
 
 					// Konwersja do MP3 za pomocą FFmpeg
+					_ffmpegConnector.FFmpegPath = FFmpegPath;
 					_ffmpegConnector.ConvertToMp3(tempFilePath, mp3FilePath);
 
 					// Usunięcie tymczasowego pliku
@@ -75,16 +82,16 @@ namespace YouTubeMusicAPI.Services
 
 				_tagger.DoTagsInFile(video, author, mp3FilePath);
 
-				Logger.LogDownloadedSong(mp3FilePath);
+				Logger.LogDownloadedSong(++counter, mp3FilePath);
 				return true;
 			}
 			catch (Exception e)
 			{
-				if (errorsNumbersDictionary.TryGetValue(videoUrl, out int errorsNumberInt))
-					errorsNumbersDictionary[videoUrl] = ++errorsNumberInt;
+				if (ErrorsNumbersDictionary.TryGetValue(videoUrl, out int errorsNumberInt))
+					ErrorsNumbersDictionary[videoUrl] = ++errorsNumberInt;
 				else
 				{
-					errorsNumbersDictionary.Add(videoUrl, 1);
+					ErrorsNumbersDictionary.Add(videoUrl, 1);
 				}
 				Logger.LogExceptionDuringDownload(videoUrl, e);
 				return false;
@@ -98,12 +105,12 @@ namespace YouTubeMusicAPI.Services
 			string toRemove = "Topic";
 			int index = input.IndexOf(toRemove);
 
-			if (index >= 3) // Sprawdź, czy istnieje wystarczająco dużo znaków do usunięcia
+			if (index >= 3)
 			{
 				return input.Remove(index - 3, toRemove.Length + 3);
 			}
 
-			return input; // Jeśli "Topic" nie istnieje lub nie ma wystarczająco dużo znaków, zwróć oryginalny string
+			return input;
 		}
 
 		static string RemoveInvalidPathChars(string path)

@@ -21,6 +21,9 @@ namespace YouTubeMusicAPI.WorkPlan
 							 string.Empty,
 							 string.Empty,
 							 string.Empty,
+							 string.Empty,
+							 string.Empty,
+							 0,
 							 false,
 							 false,
 							 false,
@@ -86,9 +89,12 @@ namespace YouTubeMusicAPI.WorkPlan
 					dislikeForBadUrls = false;
 
 				list.Add(new(playlist.PlaylistReadSettings.name,
+					playlist.PlaylistReadSettings.path,
 					UrlFileNameToSave,
 					UrlFileNameToRead,
 					BadUrlsFileNameToWrite,
+					playlist.PlaylistReadSettings.download.ffmpegPath,
+					playlist.PlaylistReadSettings.download.errorNumbersForUrl,
 					saveUrlsInFile,
 					downloadMusicFromUrlFile,
 					downloadMusicFromApi,

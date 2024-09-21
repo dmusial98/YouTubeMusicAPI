@@ -8,6 +8,7 @@ namespace YouTubeMusicAPI.Services.Interfaces
 {
     public interface IFFmpegConnector
     {
-      public void ConvertToMp3(string inputFilePath, string outputFilePath);
+        public void ConvertToMp3(string inputFilePath, string outputFilePath);
+        public string FFmpegPath { get; set; }
     }
 }

@@ -12,11 +12,6 @@ namespace YouTubeMusicAPI.Services
 	{
 		public string FFmpegPath { get; set; }
 
-		//public FFmpegConnector(string ffmpegPath)
-		//{
-		//	FFmpegPath = ffmpegPath;
-		//}
-
 		public void ConvertToMp3(string inputFilePath, string outputFilePath)
 		{
 			var processStartInfo = new ProcessStartInfo

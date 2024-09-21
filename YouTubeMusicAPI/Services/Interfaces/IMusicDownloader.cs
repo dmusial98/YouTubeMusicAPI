@@ -10,5 +10,9 @@ namespace YouTubeMusicAPI.Services.Interfaces
 	{
 		//public Task DownloadSingleAudioAsMp3Async(string videoUrl);
 		public Task DownloadAudiosAsMp3Async(string[] urls);
-	}
+        public string DirectoryPath { get; set; }
+        public string FFmpegPath { get; set; }
+        public int errorsNumberForSingleSong { get; set; }
+        public Dictionary<string, int> ErrorsNumbersDictionary { get; set; }
+    }
 }
