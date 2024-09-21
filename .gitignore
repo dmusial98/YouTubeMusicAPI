@@ -350,8 +350,7 @@ MigrationBackup/
 .ionide/
 
 #My files:
-settings.json
 client_secret.json
 packages-microsoft-prod.deb
 launch.json
-settings.json
+YouTubeMusicAPI/settings.json
