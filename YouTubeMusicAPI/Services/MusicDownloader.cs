@@ -52,7 +52,11 @@ namespace YouTubeMusicAPI.Services
 				var video = await youtube.Videos.GetAsync(videoUrl);
 
 				if (video.Duration.Value.TotalSeconds > 600)
-					Logger.LogTooLongSong($"{video.Author} - {video.Title}");
+				{
+					Logger.LogTooLongSong($"{video.Author} - {video.Title}", video.Duration.Value.TotalSeconds);
+					ErrorsNumbersDictionary.Add(videoUrl, int.MaxValue);
+					return false;
+				}
 
 				string author = RemoveTopicAndPrecedingChars(video.Author.ToString());
 				string filename = RemoveInvalidPathChars($"{author} - {video.Title}");
