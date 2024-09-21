@@ -348,3 +348,9 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+#My files:
+client_secret.json
+packages-microsoft-prod.deb
+launch.json
+YouTubeMusicAPI/settings.json
