@@ -1,45 +1,36 @@
-﻿namespace YouTubeMusicAPI.WorkPlan
+﻿using YouTubeMusicAPI.SettingsStructure;
+
+namespace YouTubeMusicAPI.WorkPlan
 {
 	public class PlaylistWorkList
 	{
 		public string PlaylistName { get; }
 		public string PlaylistPath { get; }
-		public string UrlFileNameToSave { get; set; }
-		public string UrlFileNameToRead { get; set; }
-		public string BadUrlsFileNameToWrite { get; set; }
-        public string FFmpegPath { get; set; }
-        public int ErrorsNumberForSingleSong { get; set; }
+		public string UrlFileNameToSave { get; }
+		public string UrlFileNameToRead { get; }
+		public string BadUrlsFileNameToWrite { get; }
+        public string FFmpegPath { get; }
+        public int ErrorsNumberForSingleSong { get; }
         public bool SaveUrlsInFile { get; }
 		public bool DownloadMusicFromUrlFile { get; }
 		public bool DownloadMusicFromApi { get; }
 		public bool SaveBadUrlsDuringDownloadInFile { get; }
 		public bool DislikeForBadUrls { get; }
 
-		public PlaylistWorkList(string playlistName,
-                string playlistPath,
-                string urlFileNameToSave,
-                string urlFileNameToRead,
-                string badUrlsFileNameToWrite,
-                string ffmpegPath,
-                int errorsNumberForSingleSong,
-                bool saveUrlsInFile,
-                bool downloadMusicFromUrlFile,
-                bool downloadMusicFromApi,
-                bool saveBadUrlsDuringDownloadInFile,
-                bool dislikeForBadUrls)
+        public PlaylistWorkList(PlaylistSettings playlistSettings, bool saveUrlsInFile, bool downloadMusicFromUrlFile, bool downloadMusicFromApi, bool saveBadUrlsDuringDownloadInFile, bool dislikeForBadUrls)
         {
-            PlaylistName = playlistName;
+            PlaylistName = playlistSettings.name ?? "";
+            PlaylistPath = playlistSettings.path ?? "";
+            UrlFileNameToSave = playlistSettings.urls?.urlsFileName ?? "";
+            UrlFileNameToRead = playlistSettings.download?.urlsFileName ?? "";
+            BadUrlsFileNameToWrite = playlistSettings.download?.badUrlsFileName ?? "";
+            FFmpegPath = playlistSettings.download?.ffmpegPath ?? "";
+            ErrorsNumberForSingleSong = playlistSettings.download?.errorNumbersForUrl ?? 0;
             SaveUrlsInFile = saveUrlsInFile;
             DownloadMusicFromUrlFile = downloadMusicFromUrlFile;
             DownloadMusicFromApi = downloadMusicFromApi;
             SaveBadUrlsDuringDownloadInFile = saveBadUrlsDuringDownloadInFile;
             DislikeForBadUrls = dislikeForBadUrls;
-            UrlFileNameToSave = urlFileNameToSave;
-            UrlFileNameToRead = urlFileNameToRead;
-            BadUrlsFileNameToWrite = badUrlsFileNameToWrite;
-            PlaylistPath = playlistPath;
-            FFmpegPath = ffmpegPath;
-            ErrorsNumberForSingleSong = errorsNumberForSingleSong;
         }
     }
 }

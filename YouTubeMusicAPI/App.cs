@@ -36,79 +36,110 @@ namespace YouTubeMusicAPI
 
         public async Task Run()
         {
-            //read settings
-            Settings settings = await settingsReader.ReadSettingsAsync();
-            if (settings != null)
+            var settings = await LoadSettings();
+            if (settings == null)
             {
-                var validationSettingsResults = await validator.ValidateSettingsAsync(settings);
-                Logger.LogErrorsInSettings(validationSettingsResults);
-                var workPlan = workDispatcher.PlanWork(validationSettingsResults);
-
-                if (workPlan != null && workPlan.playlistWorkList.Length > 0)
-                {
-                    foreach (var playlist in workPlan.playlistWorkList)
-                    {
-                        string[] urlsFromPlaylistYTApi = null;
-                        string[] urlsFromUrlFile = null;
-
-                        if (playlist.SaveUrlsInFile || playlist.DownloadMusicFromApi)
-                        {
-                            string playlistId = string.Empty;
-                            if (playlist.PlaylistName != "LL")
-                                playlistId = await ytApiCommunicator.GetPlaylistIdAsync(playlist.PlaylistName);
-                            else
-                                playlistId = "LL";
-
-                            urlsFromPlaylistYTApi = await ytApiCommunicator.GetUrlsFromPlaylistAsync(playlistId);
-                        }
-
-                        if (playlist.SaveUrlsInFile && urlsFromPlaylistYTApi != null)
-                            await urlFileReader.SaveUrlsInFileAsync(
-                                Path.Combine(playlist.PlaylistPath, playlist.UrlFileNameToSave),
-                                urlsFromPlaylistYTApi);
-
-                        if (playlist.DownloadMusicFromApi && urlsFromPlaylistYTApi != null)
-                        {
-                            musicDownloader.DirectoryPath = playlist.PlaylistPath;
-                            musicDownloader.FFmpegPath = playlist.FFmpegPath;
-                            musicDownloader.errorsNumberForSingleSong = playlist.ErrorsNumberForSingleSong;
-                            await musicDownloader.DownloadAudiosAsMp3Async(urlsFromPlaylistYTApi);
-                        }
-
-                        if (playlist.DownloadMusicFromUrlFile)
-                        {
-                            urlsFromUrlFile = await urlFileReader.ReadUrlsFromFileAsync(
-                                Path.Combine(playlist.PlaylistPath, playlist.UrlFileNameToRead));
-                            if (urlsFromUrlFile != null)
-                                await musicDownloader.DownloadAudiosAsMp3Async(urlsFromUrlFile);
-                        }
-
-                        if (playlist.SaveBadUrlsDuringDownloadInFile)
-                        {
-                            var dictionaryWithBadUrls = musicDownloader.ErrorsNumbersDictionary;
-
-                            List<string> badUrls = new();
-                            foreach (var badUrl in dictionaryWithBadUrls)
-                            {
-                                if (badUrl.Value >= playlist.ErrorsNumberForSingleSong)
-                                    badUrls.Add(badUrl.Key);
-                            }
-
-                            await urlFileReader.SaveUrlsInFileAsync(
-                                Path.Combine(playlist.PlaylistPath, playlist.BadUrlsFileNameToWrite),
-                                badUrls.ToArray());
-                        }
-
-                        //DislikeForBadUrls
-
-
-                    }
-                }
-                Logger.LogEndOfWork();
-                Console.ReadLine();
-            }
-            else
                 Logger.LogLeakOfSettings();
+                return;
+            }
+
+            var validationResults = await ValidateSettings(settings);
+            if (validationResults == null)
+            {
+                Logger.LogErrorsInSettings(validationResults);
+                return;
+            }
+
+            var workPlan = workDispatcher.PlanWork(validationResults);
+            if (workPlan != null && workPlan.playlistWorkList.Length > 0)
+                await ProcessWorkPlan(workPlan);
+
+            Logger.LogEndOfWork();
+            Console.ReadLine();
+        }
+
+        private async Task<Settings> LoadSettings() =>
+            await settingsReader.ReadSettingsAsync();
+
+
+        private async Task<SettingsValidationResults> ValidateSettings(Settings settings) =>
+            await validator.ValidateSettingsAsync(settings);
+
+
+        private async Task ProcessWorkPlan(WorkList workPlan)
+        {
+            foreach (var playlist in workPlan.playlistWorkList)
+            {
+                await ProcessPlaylist(playlist);
+            }
+        }
+
+        private async Task ProcessPlaylist(PlaylistWorkList playlist)
+        {
+            string[] urlsFromPlaylistYTApi = null;
+
+            if (playlist.SaveUrlsInFile || playlist.DownloadMusicFromApi)
+            {
+                var playlistId = playlist.PlaylistName == "LL"
+                    ? "LL"
+                    : await ytApiCommunicator.GetPlaylistIdAsync(playlist.PlaylistName);
+
+                urlsFromPlaylistYTApi = await ytApiCommunicator.GetUrlsFromPlaylistAsync(playlistId);
+            }
+
+            await SaveUrlsIfRequired(playlist, urlsFromPlaylistYTApi);
+            await DownloadMusicIfRequired(playlist, urlsFromPlaylistYTApi);
+            await DownloadMusicFromUrlFileIfRequired(playlist);
+            await SaveBadUrlsIfRequired(playlist);
+        }
+
+        private async Task SaveUrlsIfRequired(PlaylistWorkList playlist, string[] urlsFromPlaylistYTApi)
+        {
+            if (playlist.SaveUrlsInFile && urlsFromPlaylistYTApi != null)
+            {
+                await urlFileReader.SaveUrlsInFileAsync(
+                    Path.Combine(playlist.PlaylistPath, playlist.UrlFileNameToSave),
+                    urlsFromPlaylistYTApi);
+            }
+        }
+
+        private async Task DownloadMusicIfRequired(PlaylistWorkList playlist, string[] urlsFromPlaylistYTApi)
+        {
+            if (playlist.DownloadMusicFromApi && urlsFromPlaylistYTApi != null)
+            {
+                musicDownloader.DirectoryPath = playlist.PlaylistPath;
+                musicDownloader.FFmpegPath = playlist.FFmpegPath;
+                musicDownloader.errorsNumberForSingleSong = playlist.ErrorsNumberForSingleSong;
+                await musicDownloader.DownloadAudiosAsMp3Async(urlsFromPlaylistYTApi);
+            }
+        }
+
+        private async Task DownloadMusicFromUrlFileIfRequired(PlaylistWorkList playlist)
+        {
+            if (playlist.DownloadMusicFromUrlFile)
+            {
+                var urlsFromUrlFile = await urlFileReader.ReadUrlsFromFileAsync(
+                    Path.Combine(playlist.PlaylistPath, playlist.UrlFileNameToRead));
+                if (urlsFromUrlFile != null)
+                {
+                    await musicDownloader.DownloadAudiosAsMp3Async(urlsFromUrlFile);
+                }
+            }
+        }
+
+        private async Task SaveBadUrlsIfRequired(PlaylistWorkList playlist)
+        {
+            if (playlist.SaveBadUrlsDuringDownloadInFile)
+            {
+                var badUrls = musicDownloader.ErrorsNumbersDictionary
+                    .Where(badUrl => badUrl.Value >= playlist.ErrorsNumberForSingleSong)
+                    .Select(badUrl => badUrl.Key)
+                    .ToList();
+
+                await urlFileReader.SaveUrlsInFileAsync(
+                    Path.Combine(playlist.PlaylistPath, playlist.BadUrlsFileNameToWrite),
+                    badUrls.ToArray());
+            }
         }
     }
 }

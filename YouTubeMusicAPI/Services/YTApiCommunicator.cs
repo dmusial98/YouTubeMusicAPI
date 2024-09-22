@@ -11,7 +11,6 @@ namespace YouTubeMusicAPI.Services
 {
     public class YTApiCommunicator : IYTApiCommunicator
     {
-        //TODO: ustawic po powolaniu ytApiCommunicator nazwe pliku z credentialami
         public string credentialsFileName { get; set; }
         UserCredential? _credential;
         YouTubeService? _youtubeService;
@@ -68,6 +67,7 @@ namespace YouTubeMusicAPI.Services
 
             var request = _youtubeService.Playlists.List("snippet,contentDetails");
             request.Mine = true;
+            request.MaxResults = 100;
             var response = request.Execute();
             
             return response.Items.FirstOrDefault(p => p.Snippet.Title == playlistName)?.Id;
