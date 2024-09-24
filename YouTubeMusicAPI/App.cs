@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using YouTubeMusicAPI.Services;
@@ -40,13 +41,16 @@ namespace YouTubeMusicAPI
             if (settings == null)
             {
                 Logger.LogLeakOfSettings();
+                EndOfWork();
                 return;
             }
 
             var validationResults = await ValidateSettings(settings);
-            if (validationResults == null)
+
+            if (validationResults == null || CheckIfWasError(validationResults))
             {
                 Logger.LogErrorsInSettings(validationResults);
+                EndOfWork();
                 return;
             }
 
@@ -54,10 +58,9 @@ namespace YouTubeMusicAPI
             if (workPlan != null && workPlan.playlistWorkList.Length > 0)
                 await ProcessWorkPlan(workPlan);
 
-            Logger.LogEndOfWork();
-            Console.ReadLine();
+            EndOfWork();
         }
-
+      
         private async Task<Settings> LoadSettings() =>
             await settingsReader.ReadSettingsAsync();
 
@@ -65,6 +68,14 @@ namespace YouTubeMusicAPI
         private async Task<SettingsValidationResults> ValidateSettings(Settings settings) =>
             await validator.ValidateSettingsAsync(settings);
 
+        private bool CheckIfWasError(SettingsValidationResults validationResults)
+        {
+            return validationResults.settingsValidationPlaylistResults.Any(a => a.GetType()
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            .Where(p => p.PropertyType == typeof(bool))
+            .Select(p => (bool)p.GetValue(a))
+            .Any(value => value));
+        }
 
         private async Task ProcessWorkPlan(WorkList workPlan)
         {
@@ -140,6 +151,12 @@ namespace YouTubeMusicAPI
                     Path.Combine(playlist.PlaylistPath, playlist.BadUrlsFileNameToWrite),
                     badUrls.ToArray());
             }
+        }
+
+        private static void EndOfWork()
+        {
+            Logger.LogEndOfWork();
+            Console.ReadLine();
         }
     }
 }
