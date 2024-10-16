@@ -27,11 +27,9 @@ namespace YouTubeMusicAPI.WorkPlan
                         path = null,
                         urls = new Urls(),
                         download = new(),
-                        dislikeForBadUrls = new()
+                        //dislikeForBadUrls = new()
                     },
                     false, 
-					false, 
-					false, 
 					false, 
 					false))
                 .ToList();
@@ -48,16 +46,21 @@ namespace YouTubeMusicAPI.WorkPlan
                 bool saveUrlsInFile = ShouldSaveUrlsInFile(playlist);
                 bool downloadMusicFromUrlFile = ShouldDownloadMusicFromUrlFile(playlist);
                 bool downloadMusicFromApi = ShouldDownloadMusicFromApi(playlist);
-                bool saveBadUrlsDuringDownloadInFile = ShouldSaveBadUrlsDuringDownload(playlist, downloadMusicFromApi, downloadMusicFromUrlFile);
-                bool dislikeForBadUrls = ShouldDislikeForBadUrls(playlist);
+                //bool saveBadUrlsDuringDownloadInFile = ShouldSaveBadUrlsDuringDownload(playlist, downloadMusicFromApi, downloadMusicFromUrlFile);
+                //bool dislikeForBadUrls = ShouldDislikeForBadUrls(playlist);
 
-                list.Add(new PlaylistWorkList(playlist.PlaylistReadSettings,
-                    saveUrlsInFile,
-                    downloadMusicFromUrlFile,
-                    downloadMusicFromApi,
-                    saveBadUrlsDuringDownloadInFile,
-                    dislikeForBadUrls));
-            }
+                //list.Add(new PlaylistWorkList(playlist.PlaylistReadSettings,
+                //    saveUrlsInFile,
+                //    downloadMusicFromUrlFile,
+                //    downloadMusicFromApi,
+                //    saveBadUrlsDuringDownloadInFile,
+                //    dislikeForBadUrls));
+
+				list.Add(new PlaylistWorkList(playlist.PlaylistReadSettings,
+					saveUrlsInFile,
+					downloadMusicFromUrlFile,
+					downloadMusicFromApi));
+			}
 
             return new WorkList(list.ToArray());
         }
@@ -73,35 +76,37 @@ namespace YouTubeMusicAPI.WorkPlan
         private bool ShouldDownloadMusicFromUrlFile(SettingsValidationPlaylistResults playlist)
         {
             return playlist.PlaylistReadSettings.download.downloadMusicFromUrlFile &&
-                   !playlist.wasIncorrectFFmpegPath &&
+                   //!playlist.wasIncorrectFFmpegPath &&
                    !playlist.wasIncorrectPlaylistPath &&
-                   !playlist.wasIncorrectUrlFileToDownload &&
-                   !playlist.wasIncorrectErrorsNumberForUrl &&
-                   !playlist.wasIncorrectMaximumLengthInSeconds;
+                   !playlist.wasIncorrectUrlFileToDownload;
+                //&&
+                   //!playlist.wasIncorrectErrorsNumberForUrl &&
+                   //!playlist.wasIncorrectMaximumLengthInSeconds;
         }
 
         private bool ShouldDownloadMusicFromApi(SettingsValidationPlaylistResults playlist)
         {
             return playlist.PlaylistReadSettings.download.downloadMusicFromApi &&
-                   !playlist.wasIncorrectFFmpegPath &&
+                   //!playlist.wasIncorrectFFmpegPath &&
                    !playlist.wasIncorrectPlaylistPath &&
-                   !playlist.wasIncorrectPlaylistName &&
-                   !playlist.wasIncorrectErrorsNumberForUrl &&
-                   !playlist.wasIncorrectMaximumLengthInSeconds;
+                   !playlist.wasIncorrectPlaylistName;
+                   //&&
+                   //!playlist.wasIncorrectErrorsNumberForUrl &&
+                   //!playlist.wasIncorrectMaximumLengthInSeconds;
         }
 
-        private bool ShouldSaveBadUrlsDuringDownload(SettingsValidationPlaylistResults playlist, bool downloadMusicFromApi, bool downloadMusicFromUrlFile)
-        {
-            return playlist.PlaylistReadSettings.download.saveBadUrlsDuringDownloadInFile &&
-                   (downloadMusicFromApi || downloadMusicFromUrlFile) &&
-                   !playlist.wasIncorrectBadUrlsFileNameToSave;
-        }
+        //private bool ShouldSaveBadUrlsDuringDownload(SettingsValidationPlaylistResults playlist, bool downloadMusicFromApi, bool downloadMusicFromUrlFile)
+        //{
+        //    return playlist.PlaylistReadSettings.download.saveBadUrlsDuringDownloadInFile &&
+        //           (downloadMusicFromApi || downloadMusicFromUrlFile) &&
+        //           !playlist.wasIncorrectBadUrlsFileNameToSave;
+        //}
 
-        private bool ShouldDislikeForBadUrls(SettingsValidationPlaylistResults playlist)
-        {
-            return playlist.PlaylistReadSettings.dislikeForBadUrls.dislikeForBadUrls &&
-                   !playlist.wasIncorrectPlaylistPath &&
-                   !playlist.wasIncorrectBadUrlsFileNameToDislike;
-        }
+        //private bool ShouldDislikeForBadUrls(SettingsValidationPlaylistResults playlist)
+        //{
+        //    return playlist.PlaylistReadSettings.dislikeForBadUrls.dislikeForBadUrls &&
+        //           !playlist.wasIncorrectPlaylistPath 
+        //           //&& !playlist.wasIncorrectBadUrlsFileNameToDislike;
+        //}
     }
 }

@@ -2,11 +2,11 @@
 	"pathToClientSecretFile": "",
 	"playlists": [
 		{
-			"name": "DiscoPolo_download",
-			"path": "Z:\\MP3\\DiscoPolo_download",
+			"name": "Polskie_download",
+			"path": "Z:\\MP3\\Polskie_download",
 			"urls": {
 				"saveUrlsInFile": true,
-				"urlsFileName": "playlist_urls_discopolo.txt"
+				"urlsFileName": "playlist_urls_Polskie.txt"
 			},
 			"download": {
 				"downloadMusicFromUrlFile": false,
@@ -14,13 +14,13 @@
 				"saveBadUrlsDuringDownloadInFile": false,
 				"errorNumbersForUrl": 15,
 				"maximumLengthInSeconds": 600,
-				"urlsFileName": "playlist_urls_discopolo.txt",
-				"badUrlsFileName": "playlist_bad_urls_discopolo.txt",
+				"urlsFileName": "playlist_urls_Polskie.txt",
+				"badUrlsFileName": "playlist_bad_urls_Polskie.txt",
 				"ffmpegPath": "C:\\Users\\Dawid\\Desktop\\ffmpeg-7.0.2-essentials_build\\bin\\ffmpeg.exe"
 			},
 			"dislikeForBadUrls": {
 				"dislikeForBadUrls": false,
-				"badUrlsFileName": "playlist_bad_urls_discopolo.txt"
+				"badUrlsFileName": "playlist_bad_urls_Polskie.txt"
 			}
 		}
 	]

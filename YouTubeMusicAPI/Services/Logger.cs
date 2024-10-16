@@ -28,23 +28,23 @@ namespace YouTubeMusicAPI.Services
 					if (playlist.wasIncorrectUrlFileToSave)
 						LogLeakOfUrlFileNameToSave(playlist.PlaylistReadSettings.urls.urlsFileName);
 
-					if (playlist.wasIncorrectFFmpegPath)
-						LogInvalidPathToFFmpeg(playlist.PlaylistReadSettings.download.ffmpegPath);
+					//if (playlist.wasIncorrectFFmpegPath)
+					//	LogInvalidPathToFFmpeg(playlist.PlaylistReadSettings.download.ffmpegPath);
 
 					if (playlist.wasIncorrectUrlFileToDownload)
 						LogInvalidUrlFileName(Path.Combine(playlist.PlaylistReadSettings.path, playlist.PlaylistReadSettings.download.urlsFileName));
 					
-					if (playlist.wasIncorrectBadUrlsFileNameToSave)
-						LogIncorrectBadUrlsFileNameToSave(playlist.PlaylistReadSettings.download.badUrlsFileName);
+					//if (playlist.wasIncorrectBadUrlsFileNameToSave)
+					//	LogIncorrectBadUrlsFileNameToSave(playlist.PlaylistReadSettings.download.badUrlsFileName);
 					
-					if (playlist.wasIncorrectErrorsNumberForUrl)
-						LogIncorrectNumberOfErrorsForUrl(playlist.PlaylistReadSettings.download.errorNumbersForUrl);
+					//if (playlist.wasIncorrectErrorsNumberForUrl)
+					//	LogIncorrectNumberOfErrorsForUrl(playlist.PlaylistReadSettings.download.errorNumbersForUrl);
 					
-					if (playlist.wasIncorrectMaximumLengthInSeconds)
-						LogIncorrectMaximumLengthInSeconds(playlist.PlaylistReadSettings.download.maximumLengthInSeconds);
+					//if (playlist.wasIncorrectMaximumLengthInSeconds)
+					//	LogIncorrectMaximumLengthInSeconds(playlist.PlaylistReadSettings.download.maximumLengthInSeconds);
 				
-					if (playlist.wasIncorrectBadUrlsFileNameToDislike)
-						LogIncorrectBadUrlsFileNameToDislike(Path.Combine(playlist.PlaylistReadSettings.path, playlist.PlaylistReadSettings.dislikeForBadUrls.badUrlsFileName));
+					//if (playlist.wasIncorrectBadUrlsFileNameToDislike)
+					//	LogIncorrectBadUrlsFileNameToDislike(Path.Combine(playlist.PlaylistReadSettings.path, playlist.PlaylistReadSettings.dislikeForBadUrls.badUrlsFileName));
 				}
 			}
 		}

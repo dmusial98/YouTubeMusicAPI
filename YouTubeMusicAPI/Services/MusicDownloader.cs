@@ -14,107 +14,67 @@ namespace YouTubeMusicAPI.Services
 {
 	public class MusicDownloader : IMusicDownloader
 	{
-		IFFmpegConnector _ffmpegConnector;
-		ITagger _tagger;
+		string ytDlpPath = "yt-dlp";
+		string arguments = "-x --audio-format mp3 --audio-quality 0 --embed-thumbnail --add-metadata --max-duration 600 --output \"%(artist)s - %(title)s.%(ext)s\" ";
+		string _directoryPath = string.Empty;
 
-		public Dictionary<string, int> ErrorsNumbersDictionary { get; set; } = new();
-		public string DirectoryPath { get; set; }
-		public string FFmpegPath { get; set; }
-		public int errorsNumberForSingleSong { get; set; } = 15;
+		public string DirectoryPath {
+			get => _directoryPath;
+			set 
+			{ 
+				arguments = $"-x --audio-format mp3 --audio-quality 0 --embed-thumbnail --add-metadata --output \"{RemoveInvalidPathChars(value)}{RemoveInvalidPathChars("%(artist)s - %(title)s.%(ext)s\"")} "; 
+				_directoryPath = value;
+			}
+		}
 
-		private int counter = 0;
-
-		public MusicDownloader(IFFmpegConnector ffmpegConnector, ITagger tagger)
+		public MusicDownloader()
 		{
-			_ffmpegConnector = ffmpegConnector;
-			_tagger = tagger;
+
 		}
 
 		public async Task DownloadAudiosAsMp3Async(string[] urls)
 		{
 			Logger.LogStartDownloadingSongs(urls.Length);
-			counter = 0;
 
 			foreach (var url in urls)
-			{
-				var result = true;
-				do
-					result = await DownloadSingleAudioAsMp3Async(url);
-				while (!result && ErrorsNumbersDictionary[url] < errorsNumberForSingleSong);
-			}
+				DownloadSingleAudioAsMp3Async(url);
 		}
 
-		private async Task<bool> DownloadSingleAudioAsMp3Async(string videoUrl)
+		private void DownloadSingleAudioAsMp3Async(string videoUrl)
 		{
+
+			ProcessStartInfo processInfo = new ProcessStartInfo();
+			processInfo.FileName = ytDlpPath;
+			processInfo.Arguments = arguments + videoUrl;
+
+			// Przekierowanie wyjścia, aby móc odczytać wynik działania yt-dlp
+			processInfo.RedirectStandardOutput = true;
+			processInfo.RedirectStandardError = true;
+			processInfo.UseShellExecute = false;
+			processInfo.CreateNoWindow = true;
+
 			try
 			{
-				var youtube = new YoutubeClient();
-				var video = await youtube.Videos.GetAsync(videoUrl);
-
-				if (video.Duration.Value.TotalSeconds > 600)
+				// Uruchamiamy proces
+				using (Process process = Process.Start(processInfo))
 				{
-					Logger.LogTooLongSong($"{video.Author} - {video.Title}", video.Duration.Value.TotalSeconds);
-					ErrorsNumbersDictionary.Add(videoUrl, int.MaxValue);
-					return false;
+					// Odczytujemy i wyświetlamy wyjście
+					string output = process.StandardOutput.ReadToEnd();
+					string error = process.StandardError.ReadToEnd();
+
+					// Oczekujemy na zakończenie procesu
+					process.WaitForExit();
+
+					// Wyświetlamy wynik działania
+					Console.WriteLine("Output: " + output);
+					Console.WriteLine("Error: " + error);
 				}
-
-				string author = RemoveTopicAndPrecedingChars(video.Author.ToString());
-				string filename = RemoveInvalidPathChars($"{author} - {video.Title}");
-
-				string tempFilePath = Path.Combine(DirectoryPath, $"{filename}.webm"); // Tymczasowy plik audio
-				string mp3FilePath = Path.Combine(DirectoryPath, $"{filename}.mp3"); // Docelowy plik MP3
-
-				if (!File.Exists(mp3FilePath))
-				{
-					var streamManifest = await youtube.Videos.Streams.GetManifestAsync(video.Id);
-					var audioStreamInfo = streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
-
-					// Pobieranie strumienia audio
-					using (var inputStream = await youtube.Videos.Streams.GetAsync(audioStreamInfo))
-					using (var outputStream = File.Create(tempFilePath))
-					{
-						await inputStream.CopyToAsync(outputStream);
-					}
-
-					// Konwersja do MP3 za pomocą FFmpeg
-					_ffmpegConnector.FFmpegPath = FFmpegPath;
-					_ffmpegConnector.ConvertToMp3(tempFilePath, mp3FilePath);
-
-					// Usunięcie tymczasowego pliku
-					File.Delete(tempFilePath);
-				}
-
-				_tagger.DoTagsInFile(video, author, mp3FilePath);
-
-				Logger.LogDownloadedSong(++counter, mp3FilePath);
-				return true;
 			}
-			catch (Exception e)
+			catch (Exception ex)
 			{
-				if (ErrorsNumbersDictionary.TryGetValue(videoUrl, out int errorsNumberInt))
-					ErrorsNumbersDictionary[videoUrl] = ++errorsNumberInt;
-				else
-				{
-					ErrorsNumbersDictionary.Add(videoUrl, 1);
-				}
-				Logger.LogExceptionDuringDownload(videoUrl, e);
-				return false;
+				// Obsługa błędów
+				Console.WriteLine("Wystąpił błąd: " + ex.Message);
 			}
-		}
-
-
-
-		string RemoveTopicAndPrecedingChars(string input)
-		{
-			string toRemove = "Topic";
-			int index = input.IndexOf(toRemove);
-
-			if (index >= 3)
-			{
-				return input.Remove(index - 3, toRemove.Length + 3);
-			}
-
-			return input;
 		}
 
 		static string RemoveInvalidPathChars(string path)
