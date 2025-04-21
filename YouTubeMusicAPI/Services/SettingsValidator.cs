@@ -80,11 +80,12 @@ namespace YouTubeMusicAPI.Services
 				//}
 
 				if (playlist.download.downloadMusicFromUrlFile &&
-					!_fileChecker.CheckIfFileExists(Path.Combine(playlist.path, playlist.download.urlsFileName)))
-				{
+					!_fileChecker.CheckIfFileExists(Path.Combine(playlist.path, playlist.download.urlsFileNameToDownload)))
 					playlistResult.wasIncorrectUrlFileToDownload = true;
-				}
-
+				
+				if(playlist.download.downloadMusicWithDifferencesFile && !_fileChecker.CheckIfFileExists(Path.Combine(playlist.path, playlist.download.UrlsFileNameToReadDownloadedSongs)))
+					playlistResult.wasIncorrectDifferencesFileName = true;
+				
 				//if (playlist.download.saveBadUrlsDuringDownloadInFile && string.IsNullOrEmpty(playlist.download.badUrlsFileName))
 				//{
 				//	playlistResult.wasIncorrectBadUrlsFileNameToSave = true;

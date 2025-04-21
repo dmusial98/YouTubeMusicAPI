@@ -32,19 +32,22 @@ namespace YouTubeMusicAPI.Services
 					//	LogInvalidPathToFFmpeg(playlist.PlaylistReadSettings.download.ffmpegPath);
 
 					if (playlist.wasIncorrectUrlFileToDownload)
-						LogInvalidUrlFileName(Path.Combine(playlist.PlaylistReadSettings.path, playlist.PlaylistReadSettings.download.urlsFileName));
-					
+						LogInvalidUrlFileName(Path.Combine(playlist.PlaylistReadSettings.path, playlist.PlaylistReadSettings.download.urlsFileNameToDownload));
+
+					if (playlist.wasIncorrectDifferencesFileName)
+						LogIncorrectDifferencesFileNameToRead(Path.Combine(playlist.PlaylistReadSettings.path, playlist.PlaylistReadSettings.download.UrlsFileNameToReadDownloadedSongs));
+
 					//if (playlist.wasIncorrectBadUrlsFileNameToSave)
 					//	LogIncorrectBadUrlsFileNameToSave(playlist.PlaylistReadSettings.download.badUrlsFileName);
-					
-					//if (playlist.wasIncorrectErrorsNumberForUrl)
-					//	LogIncorrectNumberOfErrorsForUrl(playlist.PlaylistReadSettings.download.errorNumbersForUrl);
-					
-					//if (playlist.wasIncorrectMaximumLengthInSeconds)
-					//	LogIncorrectMaximumLengthInSeconds(playlist.PlaylistReadSettings.download.maximumLengthInSeconds);
-				
-					//if (playlist.wasIncorrectBadUrlsFileNameToDislike)
-					//	LogIncorrectBadUrlsFileNameToDislike(Path.Combine(playlist.PlaylistReadSettings.path, playlist.PlaylistReadSettings.dislikeForBadUrls.badUrlsFileName));
+
+						//if (playlist.wasIncorrectErrorsNumberForUrl)
+						//	LogIncorrectNumberOfErrorsForUrl(playlist.PlaylistReadSettings.download.errorNumbersForUrl);
+
+						//if (playlist.wasIncorrectMaximumLengthInSeconds)
+						//	LogIncorrectMaximumLengthInSeconds(playlist.PlaylistReadSettings.download.maximumLengthInSeconds);
+
+						//if (playlist.wasIncorrectBadUrlsFileNameToDislike)
+						//	LogIncorrectBadUrlsFileNameToDislike(Path.Combine(playlist.PlaylistReadSettings.path, playlist.PlaylistReadSettings.dislikeForBadUrls.badUrlsFileName));
 				}
 			}
 		}
@@ -72,6 +75,9 @@ namespace YouTubeMusicAPI.Services
 
 		public static void LogIncorrectBadUrlsFileNameToSave(string badUrlsFileName) =>
 			Console.WriteLine($"Incorrect bad urls file name to save: {badUrlsFileName}");
+
+		public static void LogIncorrectDifferencesFileNameToRead(string differencesFileName) =>
+			Console.WriteLine($"Incorrect differences file name to read: {differencesFileName}");
 
 		public static void LogIncorrectNumberOfErrorsForUrl(int errorNumbersForUrl) =>
 			Console.WriteLine($"Incorrect number of errors for url: {errorNumbersForUrl}");

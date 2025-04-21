@@ -1,10 +1,8 @@
-using AngleSharp.Text;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using System.Collections.Specialized;
 using System.Text;
-using TagLib;
 using YouTubeMusicAPI.Services.Interfaces;
 
 namespace YouTubeMusicAPI.Services
@@ -91,7 +89,7 @@ namespace YouTubeMusicAPI.Services
 				foreach (var playlistItem in playlistItemsResponse.Items)
 				{
 					string videoId = playlistItem.Snippet.ResourceId.VideoId;
-					string videoUrl = $"https://www.youtube.com/watch?v={videoId}";
+					string videoUrl = $"https://music.youtube.com/watch?v={videoId}";
 					videoUrls.Add(videoUrl);
 				}
 

@@ -14,99 +14,110 @@ namespace YouTubeMusicAPI.WorkPlan
 			if (validationResults.wasIncorrectPathToClientSecretFile)
 				return GenerateWorkListForInvalidSettings(validationResults);
 
-            return GenerateWorkListForValidSettings(validationResults);
-        }
+			return GenerateWorkListForValidSettings(validationResults);
+		}
 
-        private WorkList GenerateWorkListForInvalidSettings(SettingsValidationResults validationResults)
-        {
-            var list = validationResults.settingsValidationPlaylistResults
-                .Select(playlist => new PlaylistWorkList(
+		private WorkList GenerateWorkListForInvalidSettings(SettingsValidationResults validationResults)
+		{
+			var list = validationResults.settingsValidationPlaylistResults
+				.Select(playlist => new PlaylistWorkList(
 					new PlaylistSettings()
-                    {
-                        name = null,
-                        path = null,
-                        urls = new Urls(),
-                        download = new(),
-                        //dislikeForBadUrls = new()
-                    },
-                    false, 
-					false, 
+					{
+						name = null,
+						path = null,
+						urls = new Urls(),
+						download = new(),
+						//dislikeForBadUrls = new()
+					},
+					false,
+					false,
+					false,
 					false))
-                .ToList();
+				.ToList();
 
-            return new WorkList(list.ToArray());
-        }
+			return new WorkList(list.ToArray());
+		}
 
-        private WorkList GenerateWorkListForValidSettings(SettingsValidationResults validationResults)
-        {
-            var list = new List<PlaylistWorkList>();
+		private WorkList GenerateWorkListForValidSettings(SettingsValidationResults validationResults)
+		{
+			var list = new List<PlaylistWorkList>();
 
-            foreach (var playlist in validationResults.settingsValidationPlaylistResults)
-            {
-                bool saveUrlsInFile = ShouldSaveUrlsInFile(playlist);
-                bool downloadMusicFromUrlFile = ShouldDownloadMusicFromUrlFile(playlist);
-                bool downloadMusicFromApi = ShouldDownloadMusicFromApi(playlist);
-                //bool saveBadUrlsDuringDownloadInFile = ShouldSaveBadUrlsDuringDownload(playlist, downloadMusicFromApi, downloadMusicFromUrlFile);
-                //bool dislikeForBadUrls = ShouldDislikeForBadUrls(playlist);
+			foreach (var playlist in validationResults.settingsValidationPlaylistResults)
+			{
+				bool saveUrlsInFile = ShouldSaveUrlsInFile(playlist);
+				bool downloadMusicFromUrlFile = ShouldDownloadMusicFromUrlFile(playlist);
+				bool downloadMusicFromApi = ShouldDownloadMusicFromApi(playlist);
+				bool readDifferencesFile = ShouldReadDifferencesFile(playlist);
+				//bool saveBadUrlsDuringDownloadInFile = ShouldSaveBadUrlsDuringDownload(playlist, downloadMusicFromApi, downloadMusicFromUrlFile);
+				//bool dislikeForBadUrls = ShouldDislikeForBadUrls(playlist);
 
-                //list.Add(new PlaylistWorkList(playlist.PlaylistReadSettings,
-                //    saveUrlsInFile,
-                //    downloadMusicFromUrlFile,
-                //    downloadMusicFromApi,
-                //    saveBadUrlsDuringDownloadInFile,
-                //    dislikeForBadUrls));
+				//list.Add(new PlaylistWorkList(playlist.PlaylistReadSettings,
+				//    saveUrlsInFile,
+				//    downloadMusicFromUrlFile,
+				//    downloadMusicFromApi,
+				//    saveBadUrlsDuringDownloadInFile,
+				//    dislikeForBadUrls));
 
 				list.Add(new PlaylistWorkList(playlist.PlaylistReadSettings,
 					saveUrlsInFile,
 					downloadMusicFromUrlFile,
-					downloadMusicFromApi));
+					downloadMusicFromApi,
+					readDifferencesFile));
 			}
 
-            return new WorkList(list.ToArray());
-        }
+			return new WorkList(list.ToArray());
+		}
 
-        private bool ShouldSaveUrlsInFile(SettingsValidationPlaylistResults playlist)
-        {
-            return playlist.PlaylistReadSettings.urls.saveUrlsInFile &&
-                   !playlist.wasIncorrectPlaylistPath &&
-                   !playlist.wasIncorrectPlaylistName &&
-                   !playlist.wasIncorrectUrlFileToSave;
-        }
+		private bool ShouldReadDifferencesFile(SettingsValidationPlaylistResults playlist)
+		{
+			return playlist.PlaylistReadSettings.download.downloadMusicWithDifferencesFile &&
+				   !playlist.wasIncorrectDifferencesFileName &&
+				   !playlist.wasIncorrectPlaylistPath &&
+				   !playlist.wasIncorrectPlaylistName;
+		}
 
-        private bool ShouldDownloadMusicFromUrlFile(SettingsValidationPlaylistResults playlist)
-        {
-            return playlist.PlaylistReadSettings.download.downloadMusicFromUrlFile &&
-                   //!playlist.wasIncorrectFFmpegPath &&
-                   !playlist.wasIncorrectPlaylistPath &&
-                   !playlist.wasIncorrectUrlFileToDownload;
-                //&&
-                   //!playlist.wasIncorrectErrorsNumberForUrl &&
-                   //!playlist.wasIncorrectMaximumLengthInSeconds;
-        }
+		private bool ShouldSaveUrlsInFile(SettingsValidationPlaylistResults playlist)
+		{
+			return playlist.PlaylistReadSettings.urls.saveUrlsInFile &&
+				   !playlist.wasIncorrectPlaylistPath &&
+				   !playlist.wasIncorrectPlaylistName &&
+				   !playlist.wasIncorrectUrlFileToSave;
+		}
 
-        private bool ShouldDownloadMusicFromApi(SettingsValidationPlaylistResults playlist)
-        {
-            return playlist.PlaylistReadSettings.download.downloadMusicFromApi &&
-                   //!playlist.wasIncorrectFFmpegPath &&
-                   !playlist.wasIncorrectPlaylistPath &&
-                   !playlist.wasIncorrectPlaylistName;
-                   //&&
-                   //!playlist.wasIncorrectErrorsNumberForUrl &&
-                   //!playlist.wasIncorrectMaximumLengthInSeconds;
-        }
+		private bool ShouldDownloadMusicFromUrlFile(SettingsValidationPlaylistResults playlist)
+		{
+			return playlist.PlaylistReadSettings.download.downloadMusicFromUrlFile &&
+				   //!playlist.wasIncorrectFFmpegPath &&
+				   !playlist.wasIncorrectPlaylistPath &&
+				   !playlist.wasIncorrectUrlFileToDownload;
+			//&&
+			//!playlist.wasIncorrectErrorsNumberForUrl &&
+			//!playlist.wasIncorrectMaximumLengthInSeconds;
+		}
 
-        //private bool ShouldSaveBadUrlsDuringDownload(SettingsValidationPlaylistResults playlist, bool downloadMusicFromApi, bool downloadMusicFromUrlFile)
-        //{
-        //    return playlist.PlaylistReadSettings.download.saveBadUrlsDuringDownloadInFile &&
-        //           (downloadMusicFromApi || downloadMusicFromUrlFile) &&
-        //           !playlist.wasIncorrectBadUrlsFileNameToSave;
-        //}
+		private bool ShouldDownloadMusicFromApi(SettingsValidationPlaylistResults playlist)
+		{
+			return playlist.PlaylistReadSettings.download.downloadMusicFromApi &&
+				   //!playlist.wasIncorrectFFmpegPath &&
+				   !playlist.wasIncorrectPlaylistPath &&
+				   !playlist.wasIncorrectPlaylistName;
+			//&&
+			//!playlist.wasIncorrectErrorsNumberForUrl &&
+			//!playlist.wasIncorrectMaximumLengthInSeconds;
+		}
 
-        //private bool ShouldDislikeForBadUrls(SettingsValidationPlaylistResults playlist)
-        //{
-        //    return playlist.PlaylistReadSettings.dislikeForBadUrls.dislikeForBadUrls &&
-        //           !playlist.wasIncorrectPlaylistPath 
-        //           //&& !playlist.wasIncorrectBadUrlsFileNameToDislike;
-        //}
-    }
+		//private bool ShouldSaveBadUrlsDuringDownload(SettingsValidationPlaylistResults playlist, bool downloadMusicFromApi, bool downloadMusicFromUrlFile)
+		//{
+		//    return playlist.PlaylistReadSettings.download.saveBadUrlsDuringDownloadInFile &&
+		//           (downloadMusicFromApi || downloadMusicFromUrlFile) &&
+		//           !playlist.wasIncorrectBadUrlsFileNameToSave;
+		//}
+
+		//private bool ShouldDislikeForBadUrls(SettingsValidationPlaylistResults playlist)
+		//{
+		//    return playlist.PlaylistReadSettings.dislikeForBadUrls.dislikeForBadUrls &&
+		//           !playlist.wasIncorrectPlaylistPath 
+		//           //&& !playlist.wasIncorrectBadUrlsFileNameToDislike;
+		//}
+	}
 }

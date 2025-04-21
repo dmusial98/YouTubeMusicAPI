@@ -5,9 +5,6 @@ using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using YoutubeExplode;
-using YoutubeExplode.Videos;
-using YoutubeExplode.Videos.Streams;
 using YouTubeMusicAPI.Services.Interfaces;
 
 namespace YouTubeMusicAPI.Services
@@ -15,14 +12,15 @@ namespace YouTubeMusicAPI.Services
 	public class MusicDownloader : IMusicDownloader
 	{
 		string ytDlpPath = "yt-dlp";
-		string arguments = "-x --audio-format mp3 --audio-quality 0 --embed-thumbnail --add-metadata --max-duration 600 --output \"%(artist)s - %(title)s.%(ext)s\" ";
+		string arguments = "";
 		string _directoryPath = string.Empty;
+		int counter = 0;
 
 		public string DirectoryPath {
 			get => _directoryPath;
 			set 
-			{ 
-				arguments = $"-x --audio-format mp3 --audio-quality 0 --embed-thumbnail --add-metadata --output \"{RemoveInvalidPathChars(value)}{RemoveInvalidPathChars("%(artist)s - %(title)s.%(ext)s\"")} "; 
+			{
+				arguments = $"-x --audio-format mp3 --audio-quality 0 --embed-thumbnail --add-metadata --match-filters \"duration <= 900\" --cookies {Path.Combine(value, "cookies.txt")} --output \"{Path.Combine(value, RemoveInvalidPathChars("%(artist)s - %(title)s.%(ext)s"))}\" ";
 				_directoryPath = value;
 			}
 		}
@@ -35,9 +33,14 @@ namespace YouTubeMusicAPI.Services
 		public async Task DownloadAudiosAsMp3Async(string[] urls)
 		{
 			Logger.LogStartDownloadingSongs(urls.Length);
+			
 
 			foreach (var url in urls)
+			{
+				Console.Write($"{++counter}. ");
 				DownloadSingleAudioAsMp3Async(url);
+			}
+				
 		}
 
 		private void DownloadSingleAudioAsMp3Async(string videoUrl)
@@ -66,6 +69,7 @@ namespace YouTubeMusicAPI.Services
 					process.WaitForExit();
 
 					// Wyświetlamy wynik działania
+					Console.WriteLine("Arguments: " + processInfo.Arguments);
 					Console.WriteLine("Output: " + output);
 					Console.WriteLine("Error: " + error);
 				}

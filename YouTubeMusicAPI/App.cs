@@ -13,17 +13,13 @@ namespace YouTubeMusicAPI
 {
 	public class App
 	{
-		//TODO: obsluga pobierania muzyki na podstawie urlow, których nie ma w pliku z pobranymi utworami - podac defaultowa nazwe
-		//TODO: dodac pobieranie muzyki na podstawie yt-dlp
-		//TODO: usunac ffmpeg
-		//TODO dodac funkcjonalnosc usuwania id utworu
-
 		private readonly ISettingsReader settingsReader;
 		private readonly ISettingsValidator validator;
 		private readonly IWorkDispatcher workDispatcher;
 		private readonly IYTApiCommunicator ytApiCommunicator;
 		private readonly IUrlFileReaderWriter urlFileReader;
 		private readonly IMusicDownloader musicDownloader;
+
 
 		public App(ISettingsReader settingsReader,
 			ISettingsValidator validator,
@@ -104,8 +100,9 @@ namespace YouTubeMusicAPI
 			}
 
 			await SaveUrlsIfRequired(playlist, urlsFromPlaylistYTApi);
-			await DownloadMusicIfRequired(playlist, urlsFromPlaylistYTApi);
-			await DownloadMusicFromUrlFileIfRequired(playlist);
+			string[] UrlsOfDownlaodedMusic = await ReadDifferenciesFileIfRequired(playlist);
+			await DownloadMusicIfRequired(playlist, urlsFromPlaylistYTApi, UrlsOfDownlaodedMusic);
+			await DownloadMusicFromUrlFileIfRequired(playlist, UrlsOfDownlaodedMusic);
 			//await SaveBadUrlsIfRequired(playlist);
 		}
 
@@ -119,29 +116,50 @@ namespace YouTubeMusicAPI
 			}
 		}
 
-		private async Task DownloadMusicIfRequired(PlaylistWorkList playlist, string[] urlsFromPlaylistYTApi)
+		private async Task<string[]> ReadDifferenciesFileIfRequired(PlaylistWorkList playlist)
 		{
+			if (playlist.ReadDifferenciesFile)
+				return await urlFileReader.ReadUrlsFromFileAsync(Path.Combine(playlist.PlaylistPath, playlist.DifferenciesFileToRead));
+
+			return null;
+		}
+
+		private async Task DownloadMusicIfRequired(PlaylistWorkList playlist, string[] urlsFromPlaylistYTApi, string[] differenciesUrls)
+		{
+			string[] urlsToDownload = GetUrlsToDownload(urlsFromPlaylistYTApi, differenciesUrls);
+
 			if (playlist.DownloadMusicFromApi && urlsFromPlaylistYTApi != null)
 			{
 				musicDownloader.DirectoryPath = playlist.PlaylistPath;
 				//musicDownloader.FFmpegPath = playlist.FFmpegPath;
 				//musicDownloader.errorsNumberForSingleSong = playlist.ErrorsNumberForSingleSong;
-				await musicDownloader.DownloadAudiosAsMp3Async(urlsFromPlaylistYTApi);
+				await musicDownloader.DownloadAudiosAsMp3Async(urlsToDownload.ToArray());
 			}
 		}
 
-		private async Task DownloadMusicFromUrlFileIfRequired(PlaylistWorkList playlist)
+		private async Task DownloadMusicFromUrlFileIfRequired(PlaylistWorkList playlist, string[] differenciesUrls)
 		{
+			string[] urlsFromUrlFile = [];
+
 			if (playlist.DownloadMusicFromUrlFile)
-			{
-				var urlsFromUrlFile = await urlFileReader.ReadUrlsFromFileAsync(
+				urlsFromUrlFile = await urlFileReader.ReadUrlsFromFileAsync(
 					Path.Combine(playlist.PlaylistPath, playlist.UrlFileNameToRead));
-				if (urlsFromUrlFile != null)
-				{
-					await musicDownloader.DownloadAudiosAsMp3Async(urlsFromUrlFile);
-				}
-			}
+
+			string[] urlsToDownload = GetUrlsToDownload(urlsFromUrlFile, differenciesUrls);
+			musicDownloader.DirectoryPath = playlist.PlaylistPath;
+			await musicDownloader.DownloadAudiosAsMp3Async(urlsToDownload);
 		}
+
+		private static string[] GetUrlsToDownload(string[] urlsFromPlaylistYTApi, string[] differenciesUrls)
+		{
+			List<string> urlsToDownload = urlsFromPlaylistYTApi.ToList();
+
+			if (differenciesUrls != null && differenciesUrls.Length > 0)
+				foreach (string url in differenciesUrls)
+					urlsToDownload.Remove(url);
+			return urlsToDownload.ToArray();
+		}
+
 
 		//private async Task SaveBadUrlsIfRequired(PlaylistWorkList playlist)
 		//{
