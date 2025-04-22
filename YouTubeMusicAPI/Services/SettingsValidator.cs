@@ -73,29 +73,12 @@ namespace YouTubeMusicAPI.Services
 		{
 			if (playlist.download != null)
 			{
-				//if ((playlist.download.downloadMusicFromApi || playlist.download.downloadMusicFromUrlFile) &&
-				//	!_fileChecker.CheckIfFileExists(playlist.download.ffmpegPath))
-				//{
-				//	playlistResult.wasIncorrectFFmpegPath = true;
-				//}
-
 				if (playlist.download.downloadMusicFromUrlFile &&
 					!_fileChecker.CheckIfFileExists(Path.Combine(playlist.path, playlist.download.urlsFileNameToDownload)))
 					playlistResult.wasIncorrectUrlFileToDownload = true;
 				
 				if(playlist.download.downloadMusicWithDifferencesFile && !_fileChecker.CheckIfFileExists(Path.Combine(playlist.path, playlist.download.UrlsFileNameToReadDownloadedSongs)))
 					playlistResult.wasIncorrectDifferencesFileName = true;
-				
-				//if (playlist.download.saveBadUrlsDuringDownloadInFile && string.IsNullOrEmpty(playlist.download.badUrlsFileName))
-				//{
-				//	playlistResult.wasIncorrectBadUrlsFileNameToSave = true;
-				//}
-
-				//if (playlist.download.errorNumbersForUrl < 0)
-				//	playlistResult.wasIncorrectErrorsNumberForUrl = true;
-
-				//if (playlist.download.maximumLengthInSeconds <= 0)
-				//	playlistResult.wasIncorrectMaximumLengthInSeconds = true;
 			}
 		}
 

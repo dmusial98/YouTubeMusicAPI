@@ -103,7 +103,6 @@ namespace YouTubeMusicAPI
 			string[] UrlsOfDownlaodedMusic = await ReadDifferenciesFileIfRequired(playlist);
 			await DownloadMusicIfRequired(playlist, urlsFromPlaylistYTApi, UrlsOfDownlaodedMusic);
 			await DownloadMusicFromUrlFileIfRequired(playlist, UrlsOfDownlaodedMusic);
-			//await SaveBadUrlsIfRequired(playlist);
 		}
 
 		private async Task SaveUrlsIfRequired(PlaylistWorkList playlist, string[] urlsFromPlaylistYTApi)
@@ -131,8 +130,6 @@ namespace YouTubeMusicAPI
 			if (playlist.DownloadMusicFromApi && urlsFromPlaylistYTApi != null)
 			{
 				musicDownloader.DirectoryPath = playlist.PlaylistPath;
-				//musicDownloader.FFmpegPath = playlist.FFmpegPath;
-				//musicDownloader.errorsNumberForSingleSong = playlist.ErrorsNumberForSingleSong;
 				await musicDownloader.DownloadAudiosAsMp3Async(urlsToDownload.ToArray());
 			}
 		}
@@ -159,22 +156,6 @@ namespace YouTubeMusicAPI
 					urlsToDownload.Remove(url);
 			return urlsToDownload.ToArray();
 		}
-
-
-		//private async Task SaveBadUrlsIfRequired(PlaylistWorkList playlist)
-		//{
-		//	if (playlist.SaveBadUrlsDuringDownloadInFile)
-		//	{
-		//		var badUrls = musicDownloader.ErrorsNumbersDictionary
-		//			.Where(badUrl => badUrl.Value >= playlist.ErrorsNumberForSingleSong)
-		//			.Select(badUrl => badUrl.Key)
-		//			.ToList();
-
-		//		await urlFileReader.SaveUrlsInFileAsync(
-		//			Path.Combine(playlist.PlaylistPath, playlist.BadUrlsFileNameToWrite),
-		//			badUrls.ToArray());
-		//	}
-		//}
 
 		private static void EndOfWork()
 		{
