@@ -16,11 +16,12 @@ namespace YouTubeMusicAPI.WorkPlan
 		public bool DownloadMusicFromUrlFile { get; }
 		public bool DownloadMusicFromApi { get; }
 		public bool ReadDifferenciesFile { get; set; }
+		public bool RenameFiles { get; }
 
 		//public bool SaveBadUrlsDuringDownloadInFile { get; }
 		//public bool DislikeForBadUrls { get; }
 
-		public PlaylistWorkList(PlaylistSettings playlistSettings, bool saveUrlsInFile, bool downloadMusicFromUrlFile, bool downloadMusicFromApi, bool readDifferencesFile /*, bool saveBadUrlsDuringDownloadInFile, bool dislikeForBadUrls*/)
+		public PlaylistWorkList(PlaylistSettings playlistSettings, bool saveUrlsInFile, bool downloadMusicFromUrlFile, bool downloadMusicFromApi, bool readDifferencesFile, bool renameFiles /*, bool saveBadUrlsDuringDownloadInFile, bool dislikeForBadUrls*/)
 		{
 			PlaylistName = playlistSettings.name ?? "";
 			PlaylistPath = playlistSettings.path ?? "";
@@ -34,6 +35,7 @@ namespace YouTubeMusicAPI.WorkPlan
 			DownloadMusicFromUrlFile = downloadMusicFromUrlFile;
 			DownloadMusicFromApi = downloadMusicFromApi;
 			ReadDifferenciesFile = readDifferencesFile;
+			RenameFiles = renameFiles;
 			//SaveBadUrlsDuringDownloadInFile = saveBadUrlsDuringDownloadInFile;
 			//DislikeForBadUrls = dislikeForBadUrls;
 		}

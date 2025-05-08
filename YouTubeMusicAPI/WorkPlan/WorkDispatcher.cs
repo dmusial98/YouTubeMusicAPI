@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using YouTubeMusicAPI.SettingsStructure;
+﻿using YouTubeMusicAPI.SettingsStructure;
 
 namespace YouTubeMusicAPI.WorkPlan
 {
@@ -27,8 +22,8 @@ namespace YouTubeMusicAPI.WorkPlan
 						path = null,
 						urls = new Urls(),
 						download = new(),
-						//dislikeForBadUrls = new()
 					},
+					false,
 					false,
 					false,
 					false,
@@ -48,21 +43,14 @@ namespace YouTubeMusicAPI.WorkPlan
 				bool downloadMusicFromUrlFile = ShouldDownloadMusicFromUrlFile(playlist);
 				bool downloadMusicFromApi = ShouldDownloadMusicFromApi(playlist);
 				bool readDifferencesFile = ShouldReadDifferencesFile(playlist);
-				//bool saveBadUrlsDuringDownloadInFile = ShouldSaveBadUrlsDuringDownload(playlist, downloadMusicFromApi, downloadMusicFromUrlFile);
-				//bool dislikeForBadUrls = ShouldDislikeForBadUrls(playlist);
-
-				//list.Add(new PlaylistWorkList(playlist.PlaylistReadSettings,
-				//    saveUrlsInFile,
-				//    downloadMusicFromUrlFile,
-				//    downloadMusicFromApi,
-				//    saveBadUrlsDuringDownloadInFile,
-				//    dislikeForBadUrls));
+				bool renameFiles = playlist.PlaylistReadSettings.renameFiles;
 
 				list.Add(new PlaylistWorkList(playlist.PlaylistReadSettings,
 					saveUrlsInFile,
 					downloadMusicFromUrlFile,
 					downloadMusicFromApi,
-					readDifferencesFile));
+					readDifferencesFile,
+					renameFiles));
 			}
 
 			return new WorkList(list.ToArray());
@@ -87,37 +75,16 @@ namespace YouTubeMusicAPI.WorkPlan
 		private bool ShouldDownloadMusicFromUrlFile(SettingsValidationPlaylistResults playlist)
 		{
 			return playlist.PlaylistReadSettings.download.downloadMusicFromUrlFile &&
-				   //!playlist.wasIncorrectFFmpegPath &&
 				   !playlist.wasIncorrectPlaylistPath &&
 				   !playlist.wasIncorrectUrlFileToDownload;
-			//&&
-			//!playlist.wasIncorrectErrorsNumberForUrl &&
-			//!playlist.wasIncorrectMaximumLengthInSeconds;
+
 		}
 
 		private bool ShouldDownloadMusicFromApi(SettingsValidationPlaylistResults playlist)
 		{
 			return playlist.PlaylistReadSettings.download.downloadMusicFromApi &&
-				   //!playlist.wasIncorrectFFmpegPath &&
 				   !playlist.wasIncorrectPlaylistPath &&
 				   !playlist.wasIncorrectPlaylistName;
-			//&&
-			//!playlist.wasIncorrectErrorsNumberForUrl &&
-			//!playlist.wasIncorrectMaximumLengthInSeconds;
 		}
-
-		//private bool ShouldSaveBadUrlsDuringDownload(SettingsValidationPlaylistResults playlist, bool downloadMusicFromApi, bool downloadMusicFromUrlFile)
-		//{
-		//    return playlist.PlaylistReadSettings.download.saveBadUrlsDuringDownloadInFile &&
-		//           (downloadMusicFromApi || downloadMusicFromUrlFile) &&
-		//           !playlist.wasIncorrectBadUrlsFileNameToSave;
-		//}
-
-		//private bool ShouldDislikeForBadUrls(SettingsValidationPlaylistResults playlist)
-		//{
-		//    return playlist.PlaylistReadSettings.dislikeForBadUrls.dislikeForBadUrls &&
-		//           !playlist.wasIncorrectPlaylistPath 
-		//           //&& !playlist.wasIncorrectBadUrlsFileNameToDislike;
-		//}
 	}
 }

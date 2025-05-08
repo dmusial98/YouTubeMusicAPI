@@ -2,26 +2,22 @@
 	"pathToClientSecretFile": "",
 	"playlists": [
 		{
-			"name": "Polskie_download",
-			"path": "Z:\\MP3\\Polskie_download",
-			"urls": {
+			"name": "LL",
+			"path": "Z:\\MP3\\PodzieloneLL\\25_05_08",
+			"urls": {	
 				"saveUrlsInFile": true,
-				"urlsFileName": "playlist_urls_Polskie.txt"
+				"urlsFileName": "all_LL_urls.txt"
 			},
 			"download": {
 				"downloadMusicFromUrlFile": false,
 				"downloadMusicFromApi": true,
 				"saveBadUrlsDuringDownloadInFile": false,
-				"errorNumbersForUrl": 15,
-				"maximumLengthInSeconds": 600,
-				"urlsFileName": "playlist_urls_Polskie.txt",
-				"badUrlsFileName": "playlist_bad_urls_Polskie.txt",
-				"ffmpegPath": "C:\\Users\\Dawid\\Desktop\\ffmpeg-7.0.2-essentials_build\\bin\\ffmpeg.exe"
+				"urlsFileName": "all_LL_urls.txt",
+				"urlsFileNameToDownload": "all_LL_urls.txt",
+				"downloadMusicWithDifferencesFile": true,
+				"UrlsFileNameToReadDownloadedSongs": "starocie.txt"
 			},
-			"dislikeForBadUrls": {
-				"dislikeForBadUrls": false,
-				"badUrlsFileName": "playlist_bad_urls_Polskie.txt"
-			}
+			"renameFiles": true
 		}
 	]
 }

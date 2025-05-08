@@ -19,6 +19,7 @@ namespace YouTubeMusicAPI
 		private readonly IYTApiCommunicator ytApiCommunicator;
 		private readonly IUrlFileReaderWriter urlFileReader;
 		private readonly IMusicDownloader musicDownloader;
+		private readonly IFilesRenamer filesRenamer;
 
 
 		public App(ISettingsReader settingsReader,
@@ -26,7 +27,8 @@ namespace YouTubeMusicAPI
 			IWorkDispatcher workDispatcher,
 			IYTApiCommunicator ytApiCommunicator,
 			IUrlFileReaderWriter urlFileReader,
-			IMusicDownloader musicDownloader)
+			IMusicDownloader musicDownloader,
+			IFilesRenamer filesRenamer)
 		{
 			this.settingsReader = settingsReader;
 			this.validator = validator;
@@ -34,6 +36,7 @@ namespace YouTubeMusicAPI
 			this.ytApiCommunicator = ytApiCommunicator;
 			this.urlFileReader = urlFileReader;
 			this.musicDownloader = musicDownloader;
+			this.filesRenamer = filesRenamer;
 		}
 
 		public async Task Run()
@@ -81,9 +84,7 @@ namespace YouTubeMusicAPI
 		private async Task ProcessWorkPlan(WorkList workPlan)
 		{
 			foreach (var playlist in workPlan.playlistWorkList)
-			{
 				await ProcessPlaylist(playlist);
-			}
 		}
 
 		private async Task ProcessPlaylist(PlaylistWorkList playlist)
@@ -103,6 +104,13 @@ namespace YouTubeMusicAPI
 			string[] UrlsOfDownlaodedMusic = await ReadDifferenciesFileIfRequired(playlist);
 			await DownloadMusicIfRequired(playlist, urlsFromPlaylistYTApi, UrlsOfDownlaodedMusic);
 			await DownloadMusicFromUrlFileIfRequired(playlist, UrlsOfDownlaodedMusic);
+			RenameFilesIfRequired(playlist);
+		}
+
+		private void RenameFilesIfRequired(PlaylistWorkList playlist)
+		{
+			if (playlist.RenameFiles)
+				filesRenamer.RenameFiles(playlist.PlaylistPath);
 		}
 
 		private async Task SaveUrlsIfRequired(PlaylistWorkList playlist, string[] urlsFromPlaylistYTApi)

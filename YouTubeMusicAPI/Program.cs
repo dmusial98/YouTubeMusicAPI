@@ -1,13 +1,7 @@
-﻿using Google.Apis.Auth.OAuth2;
-using Google.Apis.Services;
-using Google.Apis.Util.Store;
-using Google.Apis.YouTube.v3;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Diagnostics;
 using YouTubeMusicAPI.Services;
 using YouTubeMusicAPI.Services.Interfaces;
-using YouTubeMusicAPI.SettingsStructure;
 using YouTubeMusicAPI.WorkPlan;
 
 namespace YouTubeMusicAPI
@@ -18,6 +12,9 @@ namespace YouTubeMusicAPI
 		{
 			using var host = CreateHostBuilder(args).Build();
 			await host.Services.GetRequiredService<App>().Run();
+
+			Console.ReadLine();
+			Console.ReadLine();
 		}
 
 		static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -31,6 +28,7 @@ namespace YouTubeMusicAPI
 					services.AddSingleton<IYTApiCommunicator, YTApiCommunicator>();
 					services.AddTransient<IWorkDispatcher, WorkDispatcher>();
 					services.AddTransient<IFileChecker, FileChecker>();
+					services.AddTransient<IFilesRenamer, FilesRenamer>();
 					services.AddTransient<App>();
 				});
 	}

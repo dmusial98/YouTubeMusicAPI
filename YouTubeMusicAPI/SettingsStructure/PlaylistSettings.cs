@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace YouTubeMusicAPI.SettingsStructure
+﻿namespace YouTubeMusicAPI.SettingsStructure
 {
 	public class PlaylistSettings
 	{
@@ -14,5 +7,6 @@ namespace YouTubeMusicAPI.SettingsStructure
         public Urls? urls { get; set; }
 		public Download? download { get; set; }
 		//public DislikeForBadUrls? dislikeForBadUrls { get; set; }
+		public bool renameFiles { get; set; }
 	}
 }

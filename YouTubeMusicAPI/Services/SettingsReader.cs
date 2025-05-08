@@ -17,7 +17,7 @@ namespace YouTubeMusicAPI.Services
 		public async Task<Settings> ReadSettingsAsync()
 		{
 			var fileStr = await File.ReadAllTextAsync(settingsFilePath);
-			return JsonSerializer.Deserialize<Settings>(fileStr);
+			return JsonSerializer.Deserialize<Settings>(fileStr /*, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }*/);
 		}
 	}
 }
