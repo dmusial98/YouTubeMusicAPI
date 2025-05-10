@@ -1,21 +1,15 @@
 ﻿using YouTubeMusicAPI.SettingsStructure;
-using YouTubeMusicAPI.Services;
 
 namespace YouTubeMusicAPI.WorkPlan
 {
 	public class WorkDispatcher : IWorkDispatcher
 	{
-		public async Task<WorkList> PlanWorkAsync(SettingsValidationResults validationResults)
+		public WorkList PlanWork(SettingsValidationResults validationResults)
 		{
 			if (validationResults.wasIncorrectPathToClientSecretFile)
 				return GenerateWorkListForInvalidSettings(validationResults);
 
-			return await GenerateWorkListForValidSettingsAsync(validationResults);
-		}
-
-		public WorkList PlanWork(SettingsValidationResults validationResults)
-		{
-			return PlanWorkAsync(validationResults).GetAwaiter().GetResult();
+			return GenerateWorkListForValidSettings(validationResults);
 		}
 
 		private WorkList GenerateWorkListForInvalidSettings(SettingsValidationResults validationResults)
@@ -40,7 +34,7 @@ namespace YouTubeMusicAPI.WorkPlan
 			return new WorkList(list.ToArray());
 		}
 
-		private async Task<WorkList> GenerateWorkListForValidSettingsAsync(SettingsValidationResults validationResults)
+		private WorkList GenerateWorkListForValidSettings(SettingsValidationResults validationResults)
 		{
 			var list = new List<PlaylistWorkList>();
 
