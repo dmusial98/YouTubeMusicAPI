@@ -10,5 +10,6 @@ namespace YouTubeMusicAPI.WorkPlan
 	public interface IWorkDispatcher
 	{
 		public WorkList PlanWork(SettingsValidationResults validationResults);
+		Task<WorkList> PlanWorkAsync(SettingsValidationResults validationResults);
 	}
 }

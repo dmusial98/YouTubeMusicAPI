@@ -17,7 +17,8 @@
 				"downloadMusicWithDifferencesFile": true,
 				"UrlsFileNameToReadDownloadedSongs": "starocie.txt"
 			},
-			"renameFiles": true
+			"renameFiles": true,
+			"sendToServer": true
 		}
 	],
 	"serverConfig": {

@@ -96,7 +96,7 @@ namespace YouTubeMusicAPI
 
 		private async Task ProcessPlaylist(PlaylistWorkList playlist)
 		{
-			string[] urlsFromPlaylistYTApi = null;
+			string[]? urlsFromPlaylistYTApi = null;
 
 			if (playlist.SaveUrlsInFile || playlist.DownloadMusicFromApi)
 			{
@@ -116,7 +116,8 @@ namespace YouTubeMusicAPI
 				await DownloadMusicIfRequiredAsync(playlist, urlsFromPlaylistYTApi, UrlsOfDownlaodedMusic);
 			await DownloadMusicFromUrlFileIfRequiredAsync(playlist, UrlsOfDownlaodedMusic);
 			RenameFilesIfRequired(playlist);
-			await UploadFilesAsync(playlist.PlaylistPath);
+			if (playlist.SendToServer)
+				await UploadFilesAsync(playlist.PlaylistPath);
 		}
 
 		private void RenameFilesIfRequired(PlaylistWorkList playlist)
