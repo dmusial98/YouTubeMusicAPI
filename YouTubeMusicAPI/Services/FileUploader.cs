@@ -31,6 +31,12 @@ namespace YouTubeMusicAPI.Services
             {
                 client.Connect();
 
+                if (!client.Exists(_remoteDirectory))
+                {
+                    Console.WriteLine($"Error: Remote directory '{_remoteDirectory}' does not exist on server '{_host}'.");
+                    throw new DirectoryNotFoundException($"Remote directory '{_remoteDirectory}' does not exist.");
+                }
+
                 using var fileStream = new FileStream(localFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync: true);
                 var remoteFilePath = Path.Combine(_remoteDirectory, Path.GetFileName(localFilePath));
                 remoteFilePath = remoteFilePath.Replace("\\", "/"); // Ensure correct path format for SFTP

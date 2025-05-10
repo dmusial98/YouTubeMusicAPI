@@ -25,6 +25,6 @@
 		"host": "192.168.100.6",
 		"username": "dmusial98",
 		"privateKeyPath": "C:\\Users\\Dawid\\Desktop\\KluczSSH\\windows10_legion_sshkey_private.ppk",
-		"remoteDirectory": "/home/dmusial98/tempYtMusicApiOutput"
+		"remoteDirectory": "/home/dmusial98/emby/Music"
 	}
 }
