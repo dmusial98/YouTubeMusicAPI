@@ -6,24 +6,14 @@
         {
             "label": "build",
             "command": "dotnet",
-            "type": "shell",
+            "type": "process",
             "args": [
                 "build",
-                // Ask dotnet build to generate full paths for file names.
+                "${workspaceFolder}/YouTubeMusicAPI/YouTubeMusicAPI.sln",
                 "/property:GenerateFullPaths=true",
-                // Do not generate summary otherwise it leads to duplicate errors in Problems panel
-                "/consoleloggerparameters:NoSummary"
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
-            "group": {
-                "kind": "build"
-            },
-            "presentation": {
-                "reveal": "silent"
-            },
-            "problemMatcher": "$msCompile",
-            "options": {
-                "cwd": "c:/Users/Dawid/source/repos/YouTubeMusicAPI/YouTubeMusicAPI"
-            }
+            "problemMatcher": "$msCompile"
         },
         {
             "label": "build-release",
@@ -46,6 +36,30 @@
             "options": {
                 "cwd": "c:/Users/Dawid/source/repos/YouTubeMusicAPI/YouTubeMusicAPI"
             }
+        },
+        {
+            "label": "publish",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "${workspaceFolder}/YouTubeMusicAPI/YouTubeMusicAPI.sln",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "watch",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "run",
+                "--project",
+                "${workspaceFolder}/YouTubeMusicAPI/YouTubeMusicAPI.sln"
+            ],
+            "problemMatcher": "$msCompile"
         }
     ]
 }

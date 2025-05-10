@@ -11,6 +11,5 @@ namespace YouTubeMusicAPI.Services.Interfaces
     public interface ISettingsReader
     {
         public Task<Settings> ReadSettingsAsync();
-
     }
 }

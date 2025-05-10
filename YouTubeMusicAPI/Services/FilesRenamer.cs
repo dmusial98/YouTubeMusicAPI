@@ -16,7 +16,7 @@ public class FilesRenamer : IFilesRenamer
             {
                 var newFileName = fileName.Substring(5); // Remove "NA - "
                 var newFilePath = Path.Combine(directoryPath, newFileName);
-                File.Move(file, newFilePath);
+                File.Move(file, newFilePath, overwrite: true);
             }
         }
     }

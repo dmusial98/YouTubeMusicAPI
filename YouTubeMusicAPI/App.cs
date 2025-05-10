@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using YouTubeMusicAPI.Services;
 using YouTubeMusicAPI.Services.Interfaces;
 using YouTubeMusicAPI.SettingsStructure;
@@ -15,6 +15,7 @@ namespace YouTubeMusicAPI
 		private readonly IUrlFileReaderWriter urlFileReader;
 		private readonly IMusicDownloader musicDownloader;
 		private readonly IFilesRenamer filesRenamer;
+		private readonly FileUploader fileUploader;
 
 
 		public App(ISettingsReader settingsReader,
@@ -32,6 +33,14 @@ namespace YouTubeMusicAPI
 			this.urlFileReader = urlFileReader;
 			this.musicDownloader = musicDownloader;
 			this.filesRenamer = filesRenamer;
+
+			var settings = settingsReader.ReadSettingsAsync().Result;
+			var serverConfig = settings.serverConfig;
+
+			if (serverConfig == null || string.IsNullOrEmpty(serverConfig.host) || string.IsNullOrEmpty(serverConfig.username) || string.IsNullOrEmpty(serverConfig.privateKeyPath) || string.IsNullOrEmpty(serverConfig.remoteDirectory))
+				throw new InvalidOperationException("Server configuration is incomplete or missing.");
+			
+			this.fileUploader = new FileUploader(serverConfig.host, serverConfig.username, serverConfig.privateKeyPath, serverConfig.remoteDirectory);
 		}
 
 		public async Task Run()
@@ -46,7 +55,10 @@ namespace YouTubeMusicAPI
 
 			var validationResults = await ValidateSettings(settings);
 
-			if (validationResults == null || CheckIfWasError(validationResults))
+			if (validationResults == null)
+				throw new ArgumentNullException(nameof(validationResults), "Validation results cannot be null.");
+
+			if (CheckIfWasError(validationResults))
 			{
 				Logger.LogErrorsInSettings(validationResults);
 				EndOfWork();
@@ -89,17 +101,22 @@ namespace YouTubeMusicAPI
 			if (playlist.SaveUrlsInFile || playlist.DownloadMusicFromApi)
 			{
 				var playlistId = playlist.PlaylistName == "LL"
-					? "LL"
-					: await ytApiCommunicator.GetPlaylistIdAsync(playlist.PlaylistName);
+					? "LL" : await ytApiCommunicator.GetPlaylistIdAsync(playlist.PlaylistName);
+
+				if (string.IsNullOrEmpty(playlistId))
+					throw new ArgumentException("Playlist ID cannot be null or empty.", nameof(playlistId));
 
 				urlsFromPlaylistYTApi = await ytApiCommunicator.GetUrlsFromPlaylistAsync(playlistId);
 			}
 
-			await SaveUrlsIfRequired(playlist, urlsFromPlaylistYTApi);
-			string[] UrlsOfDownlaodedMusic = await ReadDifferenciesFileIfRequired(playlist);
-			await DownloadMusicIfRequired(playlist, urlsFromPlaylistYTApi, UrlsOfDownlaodedMusic);
-			await DownloadMusicFromUrlFileIfRequired(playlist, UrlsOfDownlaodedMusic);
+			if (urlsFromPlaylistYTApi != null)
+				await SaveUrlsIfRequiredAsync(playlist, urlsFromPlaylistYTApi);
+			string[] UrlsOfDownlaodedMusic = await ReadDifferenciesFileIfRequiredAsync(playlist);
+			if (urlsFromPlaylistYTApi != null)
+				await DownloadMusicIfRequiredAsync(playlist, urlsFromPlaylistYTApi, UrlsOfDownlaodedMusic);
+			await DownloadMusicFromUrlFileIfRequiredAsync(playlist, UrlsOfDownlaodedMusic);
 			RenameFilesIfRequired(playlist);
+			await UploadFilesAsync(playlist.PlaylistPath);
 		}
 
 		private void RenameFilesIfRequired(PlaylistWorkList playlist)
@@ -108,7 +125,13 @@ namespace YouTubeMusicAPI
 				filesRenamer.RenameFiles(playlist.PlaylistPath);
 		}
 
-		private async Task SaveUrlsIfRequired(PlaylistWorkList playlist, string[] urlsFromPlaylistYTApi)
+		private async Task UploadFilesAsync(string directoryPath)
+		{
+			foreach (var file in Directory.GetFiles(directoryPath, "*.mp3"))
+				await fileUploader.UploadFileAsync(file);
+		}
+
+		private async Task SaveUrlsIfRequiredAsync(PlaylistWorkList playlist, string[] urlsFromPlaylistYTApi)
 		{
 			if (playlist.SaveUrlsInFile && urlsFromPlaylistYTApi != null)
 			{
@@ -118,15 +141,15 @@ namespace YouTubeMusicAPI
 			}
 		}
 
-		private async Task<string[]> ReadDifferenciesFileIfRequired(PlaylistWorkList playlist)
+		private async Task<string[]> ReadDifferenciesFileIfRequiredAsync(PlaylistWorkList playlist)
 		{
 			if (playlist.ReadDifferenciesFile)
 				return await urlFileReader.ReadUrlsFromFileAsync(Path.Combine(playlist.PlaylistPath, playlist.DifferenciesFileToRead));
-
-			return null;
+			
+			return Array.Empty<string>();
 		}
 
-		private async Task DownloadMusicIfRequired(PlaylistWorkList playlist, string[] urlsFromPlaylistYTApi, string[] differenciesUrls)
+		private async Task DownloadMusicIfRequiredAsync(PlaylistWorkList playlist, string[] urlsFromPlaylistYTApi, string[] differenciesUrls)
 		{
 			string[] urlsToDownload = GetUrlsToDownload(urlsFromPlaylistYTApi, differenciesUrls);
 
@@ -137,14 +160,14 @@ namespace YouTubeMusicAPI
 			}
 		}
 
-		private async Task DownloadMusicFromUrlFileIfRequired(PlaylistWorkList playlist, string[] differenciesUrls)
+		private async Task DownloadMusicFromUrlFileIfRequiredAsync(PlaylistWorkList playlist, string[] differenciesUrls)
 		{
 			string[] urlsFromUrlFile = [];
 
 			if (playlist.DownloadMusicFromUrlFile)
 				urlsFromUrlFile = await urlFileReader.ReadUrlsFromFileAsync(
 					Path.Combine(playlist.PlaylistPath, playlist.UrlFileNameToRead));
-
+					
 			string[] urlsToDownload = GetUrlsToDownload(urlsFromUrlFile, differenciesUrls);
 			musicDownloader.DirectoryPath = playlist.PlaylistPath;
 			await musicDownloader.DownloadAudiosAsMp3Async(urlsToDownload);
