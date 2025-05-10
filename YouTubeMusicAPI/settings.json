@@ -3,7 +3,7 @@
 	"playlists": [
 		{
 			"name": "LL",
-			"path": "Z:\\MP3\\PodzieloneLL\\25_05_08",
+			"path": "Z:\\MP3\\PodzieloneLL\\25_05_10",
 			"urls": {	
 				"saveUrlsInFile": true,
 				"urlsFileName": "all_LL_urls.txt"
@@ -19,5 +19,11 @@
 			},
 			"renameFiles": true
 		}
-	]
+	],
+	"serverConfig": {
+		"host": "192.168.100.6",
+		"username": "dmusial98",
+		"privateKeyPath": "C:\\Users\\Dawid\\Desktop\\KluczSSH\\windows10_legion_sshkey_private.ppk",
+		"remoteDirectory": "/home/dmusial98/tempYtMusicApiOutput"
+	}
 }
