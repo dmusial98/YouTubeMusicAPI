@@ -47,11 +47,8 @@ namespace YouTubeMusicAPI.WorkPlan
 				bool downloadMusicFromUrlFile = ShouldDownloadMusicFromUrlFile(playlist);
 				bool downloadMusicFromApi = ShouldDownloadMusicFromApi(playlist);
 				bool readDifferencesFile = ShouldReadDifferencesFile(playlist);
-				
-				bool willBeDownload = downloadMusicFromApi || downloadMusicFromUrlFile;
-				
-				bool renameFiles = willBeDownload && playlist.PlaylistReadSettings.renameFiles;
-				bool sendToServer = willBeDownload && playlist.PlaylistReadSettings.sendToServer;
+				bool renameFiles = playlist.PlaylistReadSettings.renameFiles;
+				bool sendToServer = playlist.PlaylistReadSettings.sendToServer;
 
 				list.Add(new PlaylistWorkList(
 					playlist.PlaylistReadSettings,

@@ -54,36 +54,5 @@ namespace YouTubeMusicAPI.Services
                 client.Disconnect();
             }
         }
-
-        public void UploadFile(string localFilePath)
-        {
-            if (!File.Exists(localFilePath))
-            {
-                throw new FileNotFoundException("Local file not found.", localFilePath);
-            }
-
-            using var privateKey = new PrivateKeyFile(_privateKeyPath);
-            using var client = new SftpClient(_host, _username, new[] { privateKey });
-
-            try
-            {
-                client.Connect();
-
-                using var fileStream = new FileStream(localFilePath, FileMode.Open);
-                var remoteFilePath = Path.Combine(_remoteDirectory, Path.GetFileName(localFilePath));
-                client.UploadFile(fileStream, remoteFilePath);
-
-                Console.WriteLine($"File '{localFilePath}' uploaded to '{remoteFilePath}' on server '{_host}'.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error uploading file: {ex.Message}");
-                throw;
-            }
-            finally
-            {
-                client.Disconnect();
-            }
-        }
     }
 }
